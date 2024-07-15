@@ -17,4 +17,16 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    Route::get('/search-itinerary', function () {
+        return view('search-itinerary'); // Créez cette vue si nécessaire
+    })->name('search-itinerary');
+
+    Route::get('/my-trips', function () {
+        return view('my-trips'); // Créez cette vue si nécessaire
+    })->name('my-trips');
+
+    Route::get('/trends', function () {
+        return view('trends'); // Créez cette vue si nécessaire
+    })->name('trends');
 });
