@@ -15,6 +15,15 @@
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    <x-nav-link href="{{ route('search-itinerary') }}" :active="request()->routeIs('search-itinerary')">
+                        Rechercher un itinéraire
+                    </x-nav-link>
+                    <x-nav-link href="{{ route('my-trips') }}" :active="request()->routeIs('my-trips')">
+                        Mes voyages
+                    </x-nav-link>
+                    <x-nav-link href="{{ route('trends') }}" :active="request()->routeIs('trends')">
+                        Tendances
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -142,7 +151,18 @@
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('search-itinerary') }}" :active="request()->routeIs('search-itinerary')">
+                Rechercher un itinéraire
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('my-trips') }}" :active="request()->routeIs('my-trips')">
+                Mes voyages
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('trends') }}" :active="request()->routeIs('trends')">
+                Tendances
+            </x-responsive-nav-link>
+
         </div>
+
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
