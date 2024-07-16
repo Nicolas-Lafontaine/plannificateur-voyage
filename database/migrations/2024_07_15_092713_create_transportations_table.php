@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('transportations', function (Blueprint $table) {
             $table->id();
-            $table->text('name'); 
+            $table->string('name'); 
             $table->decimal('co2_emission_per_km');
             $table->timestamps();
         });

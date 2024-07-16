@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Trip extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'arrival_location', 'departure_location', 'transportation_id', 'commentary_id', 'days_spent_at_destination', 'length_in_km', 'duration_estimated', 'description', 'pictures',
+    ];
+
+    public function arrivalLocation()
+    {
+        return $this->belongsTo(Location::class, 'arrival_location');
+    }
+
+    public function departureLocation()
+    {
+        return $this->belongsTo(Location::class, 'departure_location');
+    }
+
+    public function transportation()
+    {
+        return $this->belongsTo(Transportation::class);
+    }
+
+    public function commentary()
+    {
+        return $this->belongsTo(Commentary::class);
+    }
+}
