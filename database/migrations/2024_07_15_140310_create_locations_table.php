@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transportations', function (Blueprint $table) {
+        Schema::create('locations', function (Blueprint $table) {
             $table->id();
-            $table->text('name'); 
-            $table->decimal('co2_emission_per_km');
+            $table->foreignId('country_id')->constrained()->onDelete('cascade');
+            $table->geometry('location_coordinates'); 
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transportations');
+        Schema::dropIfExists('locations');
     }
 };

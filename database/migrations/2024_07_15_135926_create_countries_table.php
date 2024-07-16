@@ -11,10 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transportations', function (Blueprint $table) {
+        Schema::create('countries', function (Blueprint $table) {
             $table->id();
-            $table->text('name'); 
-            $table->decimal('co2_emission_per_km');
+            $table->string('name'); 
+            $table->decimal('housing_price_per_day');
+            $table->decimal('food_price_per_day');
+            $table->decimal('transport_price_per_day');
+            $table->decimal('average_highest_temperature');
+            $table->decimal('average_lowest_temperature');
             $table->timestamps();
         });
     }
@@ -24,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transportations');
+        Schema::dropIfExists('countries');
     }
 };

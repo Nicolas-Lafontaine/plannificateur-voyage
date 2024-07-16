@@ -11,19 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transportations', function (Blueprint $table) {
+        Schema::create('travels', function (Blueprint $table) {
             $table->id();
-            $table->text('name'); 
-            $table->decimal('co2_emission_per_km');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('trip_id')->constrained()->onDelete('cascade');
+            $table->string('name');
+            $table->decimal('total_length', 8, 2); 
             $table->timestamps();
         });
     }
-
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('transportations');
+        Schema::dropIfExists('travels');
     }
 };
