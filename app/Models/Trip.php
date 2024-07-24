@@ -10,7 +10,7 @@ class Trip extends Model
     use HasFactory;
 
     protected $fillable = [
-        'arrival_location', 'departure_location', 'transportation_id', 'commentary_id', 'days_spent_at_destination', 'length_in_km', 'duration_estimated', 'description', 'pictures',
+        'travel_id','arrival_location', 'departure_location', 'transportation_id', 'commentary_id', 'days_spent_at_destination', 'length_in_km', 'duration_estimated', 'description', 'pictures',
     ];
 
     public function arrivalLocation()
@@ -31,5 +31,10 @@ class Trip extends Model
     public function commentary()
     {
         return $this->belongsTo(Commentary::class);
+    }
+
+    public function travel()
+    {
+        return $this->belongsTo(Travel::class);
     }
 }

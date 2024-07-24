@@ -15,13 +15,13 @@
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link href="{{ route('search-itinerary') }}" :active="request()->routeIs('search-itinerary')">
+                    <x-nav-link href="{{ route('searchitinerary') }}" :active="request()->routeIs('searchitinerary')">
                         Rechercher un itinéraire
                     </x-nav-link>
-                    <x-nav-link href="{{ route('my-trips') }}" :active="request()->routeIs('my-trips')">
+                    <x-nav-link href="{{ route('mytrips') }}" :active="request()->routeIs('mytrips')">
                         Mes voyages
                     </x-nav-link>
-                    <x-nav-link href="{{ route('trends') }}" :active="request()->routeIs('trends')">
+                    <x-nav-link href="{{ route('trends!') }}" :active="request()->routeIs('trends!')">
                         Tendances
                     </x-nav-link>
                 </div>
@@ -151,13 +151,13 @@
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('search-itinerary') }}" :active="request()->routeIs('search-itinerary')">
+            <x-responsive-nav-link href="{{ route('searchitinerary') }}" :active="request()->routeIs('searchitinerary')">
                 Rechercher un itinéraire
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('my-trips') }}" :active="request()->routeIs('my-trips')">
+            <x-responsive-nav-link href="{{ route('mytrips') }}" :active="request()->routeIs('mytrips')">
                 Mes voyages
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('trends') }}" :active="request()->routeIs('trends')">
+            <x-responsive-nav-link href="{{ route('trends!') }}" :active="request()->routeIs('trends!')">
                 Tendances
             </x-responsive-nav-link>
 

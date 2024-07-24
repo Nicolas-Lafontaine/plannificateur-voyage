@@ -10,16 +10,18 @@ class Travel extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'trip_id', 'name', 'total_length',
+        'user_id', 'name', 'total_length',
     ];
 
+    protected $table = 'travels';
+    
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function trip()
+    public function trips()
     {
-        return $this->belongsTo(Trip::class);
+        return $this->hasMany(Trip::class);
     }
 }
