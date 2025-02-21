@@ -10,7 +10,7 @@ class Transportation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'co2_emission_per_km',
+        'name', 'co2_emission_per_km_grams',
     ];
 
     public function trips()

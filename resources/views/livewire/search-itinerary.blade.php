@@ -13,6 +13,7 @@
                     <input type="number" wire:model.lazy="minLength" placeholder="Longueur minimale (en km)" class="w-full p-2 border rounded">
                     <input type="number" wire:model.lazy="maxLength" placeholder="Longueur maximale (en km)" class="w-full p-2 border rounded mt-2">
                 </div>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded" wire:click="render">Filtrer</button>
             </div>
         </div>
 
@@ -25,7 +26,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ $travel->name }}</h5>
                             <p class="card-text">Distance totale : {{ $travel->total_length }} km</p>
-                            <a href="#" class="btn btn-primary">Voir</a>
+                            <a href="{{ route('travels.show', $travel->id) }}" class="btn btn-primary">Voir</a>
                         </div>
                     </div>
                 </div>
@@ -34,6 +35,11 @@
                     <p>Aucun voyage trouvé avec les critères de recherche.</p>
                 </div>
             @endforelse
+        </div>
+
+        <!-- Pagination -->
+        <div class="mt-4 d-flex justify-content-center">
+            {{ $travels->links() }}
         </div>
     </div>
 </div>

@@ -10,7 +10,9 @@ class Location extends Model
     use HasFactory;
 
     protected $fillable = [
-        'country_id', 'location_coordinates',
+        'country_id',
+        'latitude',
+        'longitude',
     ];
 
     public function country()
