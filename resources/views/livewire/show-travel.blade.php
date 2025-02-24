@@ -1,11 +1,29 @@
-<x-app-layout>
-    <div>
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ $travel->name }}
-        </h2>
-        <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-            <p><strong>Distance totale:</strong> {{ $travel->total_length }} km</p>
-            <!-- Ajoutez plus de détails ici selon vos besoins -->
-        </div>
-    </div>
-</x-app-layout>
+<div wire:ignore.self>
+    <div id="map" style="height: 800px;"></div>
+</div>
+
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+@endpush
+
+@push('scripts')
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const mapContainer = document.getElementById('map');
+
+    if (mapContainer && !mapContainer._leaflet_id) { // Empêche la réinitialisation multiple
+        const map = L.map('map').setView([45.5017, -73.5673], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        L.marker([45.5017, -73.5673]).addTo(map)
+            .bindPopup('Montreal !')
+            .openPopup();
+    }
+});
+
+</script>
+@endpush
