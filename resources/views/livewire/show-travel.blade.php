@@ -10,16 +10,22 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+
+    const latitude = @js($latitude3Riviere);
+    const longitude = @js($longitude3Riviere);
+
     const mapContainer = document.getElementById('map');
 
     if (mapContainer && !mapContainer._leaflet_id) { // Empêche la réinitialisation multiple
-        const map = L.map('map').setView([45.5017, -73.5673], 13);
+        const map = L.map('map').setView([latitude, longitude], 13);
+
+
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        L.marker([45.5017, -73.5673]).addTo(map)
+        L.marker([latitude, longitude]).addTo(map)
             .bindPopup('Montreal !')
             .openPopup();
     }
