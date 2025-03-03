@@ -10,7 +10,7 @@ class Travel extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'name', 'total_length',
+        'user_id', 'name', 'total_length','public','image_url',
     ];
 
     protected $table = 'travels';

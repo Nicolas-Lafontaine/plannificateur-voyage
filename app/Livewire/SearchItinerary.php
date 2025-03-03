@@ -39,6 +39,8 @@ class SearchItinerary extends Component
             $query->where('total_length', '<=', $this->maxLength);
         }
 
+        $query->where('public', true);
+
         // Récupérer les résultats paginés
         $travels = $query->paginate(5);
 

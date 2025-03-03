@@ -11,7 +11,7 @@ class DashboardLatestTravels extends Component
 
     public function mount()
     {
-        $this->latestTravels = Travel::orderBy('created_at', 'desc')->take(3)->get();
+        $this->latestTravels = Travel::where('public', true)->orderBy('created_at', 'desc')->take(3)->get();
     }
 
     public function render()
