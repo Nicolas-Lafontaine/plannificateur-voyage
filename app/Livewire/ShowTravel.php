@@ -44,15 +44,15 @@ class ShowTravel extends Component
         $response = Http::get($url);
     
         if ($response->successful() && isset($response['routes'][0]['geometry'])) {
-            $routeGeoJSON = $response['routes'][0]['geometry'];
+            $routeGeoJSON = $response['routes'][0]['geometry']; // On extrait les données GeoJSON de la réponse, si le format est correct
     
             //(storage/logs/laravel.log)
             \Log::info('Route GeoJSON:', [$routeGeoJSON]);
     
-            $this->latitudeTest = $startLat;
-            $this->longitudeTest = $startLon;
+            $this->latitudeTest = $startLat; // On passe les coordonnées de départ à la carte via des propriétés
+            $this->longitudeTest = $startLon; // (à effacer ?)
     
-            $this->dispatch('updateRoute', $routeGeoJSON);
+            $this->dispatch('updateRoute', $routeGeoJSON); // Déclenche l'événement 'updateRoute' avec les données GeoJSON
         } else {
             \Log::error('Erreur OSRM: ' . $response->body());
             session()->flash('error', 'Erreur lors de la récupération de la route.');

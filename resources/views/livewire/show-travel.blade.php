@@ -23,6 +23,7 @@
 <script>
 let map;  
 let routeLayer; 
+let startMarker, endMarker;
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -32,21 +33,62 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!map) {
         // Initialisation unique de la carte
-        map = L.map('map').setView([initialLat, initialLng], zoomLevel);
+        map = L.map('map').setView([initialLat, initialLng], zoomLevel); // 'map' est l'id html et map la variable js
         console.log('🗺️ Carte initialisée avec succès');
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
     }
 
-    window.addEventListener('updateRoute', (event) => {
-        const routeGeoJSON = event.detail; // Récupérer les données de l'événement
-        if (routeLayer) {
-            map.removeLayer(routeLayer); // Supprimer l'ancienne route
+        // Ajout des marqueurs de départ et d'arrivée
+        function updateMarkers(startCoords, endCoords) {
+            // Supprime les anciens marqueurs s'ils existent
+            if (startMarker) {
+                map.removeLayer(startMarker);
+            }
+            if (endMarker) {
+                map.removeLayer(endMarker);
+            }
+
+            // Ajoute les nouveaux marqueurs
+            startMarker = L.marker(startCoords).addTo(map)
+                .bindPopup("Point de départ").openPopup();
+            endMarker = L.marker(endCoords).addTo(map)
+                .bindPopup("Point d'arrivée").openPopup();
         }
 
-            routeLayer = L.geoJSON(routeGeoJSON, { color: 'blue', weight: 4 }).addTo(map);
-            map.fitBounds(routeLayer.getBounds()); // Ajuster la vue
+    window.addEventListener('updateRoute', (event) => {
+        let routeGeoJSON = event.detail; // Récupérer les données de l'événement (la réponse de OSRM)
+        
+        console.log('event.detail avant conversion : ',event.detail);
+
+        if (Array.isArray(routeGeoJSON)) { // event.detail est un tableau de coordonnées, on le convertit en GeoJSON
+        routeGeoJSON = {
+            "type": "FeatureCollection",
+            "features": routeGeoJSON.map(item => ({
+                "type": "Feature",
+                "geometry": item
+            }))
+        };
+    }
+    console.log('event.detail après conversion : ',event.detail);
+
+        if (routeLayer) {
+            map.removeLayer(routeLayer); // Supprimer l'ancienne route si il'y en a une déjà affichée
+        }
+        
+        routeLayer = L.geoJSON(routeGeoJSON, { color: 'blue', weight: 4 }).addTo(map);
+        map.fitBounds(routeLayer.getBounds()); // Ajuster la vue pour voir tout le tracé de l'itinéraire
+
+        // Récupération des points de départ et d'arrivée
+        const coordinates = routeGeoJSON.features[0].geometry.coordinates; // Récuération des coordonnées de la route
+        const startCoords = [coordinates[0][1], coordinates[0][0]]; // Leaflet utilise [lat, lng] donc on inverse
+        const endCoords = [coordinates[coordinates.length - 1][1], coordinates[coordinates.length - 1][0]]; //inversion également
+
+        console.log('startCoords & endCoords finaux : ',startCoords, endCoords)
+
+        // Mise à jour des marqueurs
+        updateMarkers(startCoords, endCoords);
         });
     });
 
