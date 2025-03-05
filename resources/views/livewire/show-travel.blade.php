@@ -2,6 +2,10 @@
     <div class="mb-4">
         <label>Départ : <input type="text" wire:model="start" placeholder="-42.0,71.0" class="border rounded p-1" /></label>
         <label>Arrivée : <input type="text" wire:model="end" placeholder="-41.0,72.0" class="border rounded p-1" /></label>
+        <label>Points intermédiaires : 
+    <input type="text" wire:model="waypoints" placeholder="-41.5,71.5;-41.7,71.7" class="border rounded p-1" />
+</label>
+
         <button wire:click="getRoute" class="px-4 py-2 bg-blue-500 text-white rounded">Tracer la route</button>
     </div>
 
@@ -23,7 +27,7 @@
 <script>
 let map;  
 let routeLayer; 
-let startMarker, endMarker;
+let markers = [];
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -41,20 +45,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
         // Ajout des marqueurs de départ et d'arrivée
-        function updateMarkers(startCoords, endCoords) {
-            // Supprime les anciens marqueurs s'ils existent
-            if (startMarker) {
-                map.removeLayer(startMarker);
-            }
-            if (endMarker) {
-                map.removeLayer(endMarker);
-            }
+        function updateMarkers(routeCoordinates) {
+        // Supprime les anciens marqueurs
+        markers.forEach(marker => map.removeLayer(marker));
+        markers = [];
 
-            // Ajoute les nouveaux marqueurs
-            startMarker = L.marker(startCoords).addTo(map)
-                .bindPopup("Point de départ").openPopup();
-            endMarker = L.marker(endCoords).addTo(map)
-                .bindPopup("Point d'arrivée").openPopup();
+        // Ajoute les nouveaux marqueurs sur chaque point du tracé
+        routeCoordinates.forEach((coord, index) => {
+            let marker = L.marker([coord[1], coord[0]]).addTo(map)
+                .bindPopup(index === 0 ? "Départ" : (index === routeCoordinates.length - 1 ? "Arrivée" : "Point intermédiaire"));
+            markers.push(marker);
+        });
         }
 
     window.addEventListener('updateRoute', (event) => {
@@ -80,15 +81,9 @@ document.addEventListener('DOMContentLoaded', function () {
         routeLayer = L.geoJSON(routeGeoJSON, { color: 'blue', weight: 4 }).addTo(map);
         map.fitBounds(routeLayer.getBounds()); // Ajuster la vue pour voir tout le tracé de l'itinéraire
 
-        // Récupération des points de départ et d'arrivée
-        const coordinates = routeGeoJSON.features[0].geometry.coordinates; // Récuération des coordonnées de la route
-        const startCoords = [coordinates[0][1], coordinates[0][0]]; // Leaflet utilise [lat, lng] donc on inverse
-        const endCoords = [coordinates[coordinates.length - 1][1], coordinates[coordinates.length - 1][0]]; //inversion également
-
-        console.log('startCoords & endCoords finaux : ',startCoords, endCoords)
-
-        // Mise à jour des marqueurs
-        updateMarkers(startCoords, endCoords);
+        // Récupération de toutes les coordonnées de l'itinéraire
+        const coordinates = routeGeoJSON.features[0].geometry.coordinates;
+        updateMarkers(coordinates); // Ajout des marqueurs sur tous les points
         });
     });
 

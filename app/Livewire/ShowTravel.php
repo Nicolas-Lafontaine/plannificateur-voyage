@@ -18,14 +18,18 @@ class ShowTravel extends Component
     public $longitude3Riviere = -72.5501; // Valeur par défaut pour Montréal
 
     // Valeurs utilisées pour le test API
-    public $start = "-42.0,71.0";
-    public $end = "-41.0,72.0";
+    public $start = "-51.708966,64.183547";
+    public $end = "-51.710552,64.179831";
     public $routeData;
 
-    // Valeurs test pour initialiser la carte
+    // Valeurs test pour initialiser la carte (Nuuk)
     public $latitudeTest = "72.0";
     public $longitudeTest = "-41.0";
     public $zoomTest = "6";
+
+    // Variable pour les points de passage
+    public $waypoints = "-51.708693,64.182738;-51.709850,64.181253";
+
 
     public function getRoute()
     {
@@ -40,7 +44,23 @@ class ShowTravel extends Component
         [$startLon, $startLat] = array_map('trim', $startCoords); // TO DELETE
         [$endLon, $endLat] = array_map('trim', $endCoords); // Il faudra utiliser $travel->$trip->arrival_location ET $travel->$trip->departure_location->latitude et longitude
     
-        $url = "http://localhost:5000/route/v1/driving/{$startLon},{$startLat};{$endLon},{$endLat}?overview=full&geometries=geojson";
+        // Vérifier si des waypoints sont définis et bien formatés
+        $waypointsArray = [];
+        if (!empty($this->waypoints)) {
+            $waypointsArray = explode(';', $this->waypoints);
+            foreach ($waypointsArray as $key => $waypoint) {
+                $waypointsArray[$key] = trim($waypoint);
+                if (count(explode(',', $waypoint)) !== 2) {
+                    session()->flash('error', 'Format invalide pour les points intermédiaires.');
+                    return;
+                }
+            }
+        }
+
+        // Construction de la requête OSRM avec waypoints
+        $waypointsString = !empty($waypointsArray) ? ';' . implode(';', $waypointsArray) : '';
+        $url = "http://localhost:5000/route/v1/driving/{$startLon},{$startLat}{$waypointsString};{$endLon},{$endLat}?overview=full&geometries=geojson";
+
         $response = Http::get($url);
     
         if ($response->successful() && isset($response['routes'][0]['geometry'])) {
