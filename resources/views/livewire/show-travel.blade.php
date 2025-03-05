@@ -45,17 +45,29 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
         // Ajout des marqueurs de départ et d'arrivée
-        function updateMarkers(routeCoordinates) {
+        function updateMarkers(routeCoordinates, waypoints) {
         // Supprime les anciens marqueurs
         markers.forEach(marker => map.removeLayer(marker));
         markers = [];
 
-        // Ajoute les nouveaux marqueurs sur chaque point du tracé
-        routeCoordinates.forEach((coord, index) => {
-            let marker = L.marker([coord[1], coord[0]]).addTo(map)
-                .bindPopup(index === 0 ? "Départ" : (index === routeCoordinates.length - 1 ? "Arrivée" : "Point intermédiaire"));
+            // Ajoute le marqueur de départ
+        let startMarker = L.marker([routeCoordinates[0][1], routeCoordinates[0][0]]).addTo(map)
+            .bindPopup("Départ");
+        markers.push(startMarker);
+
+        // Ajoute les marqueurs pour les points intermédiaires
+        waypoints.forEach((waypoint, index) => {
+            let [lon, lat] = waypoint.split(',').map(coord => parseFloat(coord.trim()));
+            let marker = L.marker([lat, lon]).addTo(map)
+                .bindPopup(`Point intermédiaire ${index + 1}`);
             markers.push(marker);
         });
+
+        // Ajoute le marqueur d'arrivée
+        let endMarker = L.marker([routeCoordinates[routeCoordinates.length - 1][1], routeCoordinates[routeCoordinates.length - 1][0]]).addTo(map)
+            .bindPopup("Arrivée");
+        markers.push(endMarker);
+
         }
 
     window.addEventListener('updateRoute', (event) => {
@@ -81,9 +93,15 @@ document.addEventListener('DOMContentLoaded', function () {
         routeLayer = L.geoJSON(routeGeoJSON, { color: 'blue', weight: 4 }).addTo(map);
         map.fitBounds(routeLayer.getBounds()); // Ajuster la vue pour voir tout le tracé de l'itinéraire
 
-        // Récupération de toutes les coordonnées de l'itinéraire
-        const coordinates = routeGeoJSON.features[0].geometry.coordinates;
-        updateMarkers(coordinates); // Ajout des marqueurs sur tous les points
+            // Récupération de toutes les coordonnées de l'itinéraire
+    const coordinates = routeGeoJSON.features[0].geometry.coordinates;
+
+    // Récupérer les waypoints depuis le composant Livewire
+    const waypoints = @js(explode(';', $waypoints)); // Assurez-vous que $waypoints est bien formaté
+
+    console.log('waypoints : ',waypoints);
+
+    updateMarkers(coordinates, waypoints); // Ajout des marqueurs sur tous les points
         });
     });
 
