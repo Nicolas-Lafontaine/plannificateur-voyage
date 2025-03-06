@@ -17,12 +17,12 @@ class ShowTravel extends Component
     public $latitude3Riviere = 46.3498; // Valeur par défaut pour Montréal
     public $longitude3Riviere = -72.5501; // Valeur par défaut pour Montréal
 
-    // Valeurs utilisées pour le test API
+    // Valeurs utilisées pour le test API (Nuuk)
     public $start = "-51.708966,64.183547";
     public $end = "-51.710552,64.179831";
     public $routeData;
 
-    // Valeurs test pour initialiser la carte (Nuuk)
+    // Valeurs test pour initialiser la carte 
     public $latitudeTest = "72.0";
     public $longitudeTest = "-41.0";
     public $zoomTest = "6";
@@ -30,9 +30,26 @@ class ShowTravel extends Component
     // Variable pour les points de passage
     public $waypoints = "-51.708693,64.182738;-51.709850,64.181253";
 
+    // Méthode pour récupérer la route entre deux points
 
     public function getRoute()
     {
+
+        // Récupérer les données de départ et d'arrivée + étapes pour le travel sélectionné   
+        
+        $firstTrip = $this->travel->trips->first();
+        $lastTrip = $this->travel->trips->last();
+
+        // Récupérer les coordonnées de départ et d'arrivée du premier trajet
+        $firstTripStartLat = $firstTrip->departureLocation->latitude;
+        $firstTripStartLon = $firstTrip->departureLocation->longitude;
+
+        // Récupérer les coordonnées de départ et d'arrivée du dernier trajet
+        $lastTripEndLat = $lastTrip->arrivalLocation->latitude;
+        $lastTripEndLon = $lastTrip->arrivalLocation->longitude;
+
+        // Récupérer les coordonnées des étapes intermédiaires
+
         $startCoords = explode(',', $this->start); // Partie à supprimer car les coordonnées sont stockées séparément dans la base de données
         $endCoords = explode(',', $this->end);
     
@@ -44,6 +61,12 @@ class ShowTravel extends Component
         [$startLon, $startLat] = array_map('trim', $startCoords); // TO DELETE
         [$endLon, $endLat] = array_map('trim', $endCoords); // Il faudra utiliser $travel->$trip->arrival_location ET $travel->$trip->departure_location->latitude et longitude
     
+        \Log::info('firstTripStartLat :', [$firstTripStartLat]);
+        \Log::info('firstTripStartLon :', [$firstTripStartLon]);
+        \Log::info('endLon :', [$endLon]);
+        \Log::info('endLat :', [$endLat]);
+
+
         // Vérifier si des waypoints sont définis et bien formatés
         $waypointsArray = [];
         if (!empty($this->waypoints)) {
@@ -59,7 +82,7 @@ class ShowTravel extends Component
 
         // Construction de la requête OSRM avec waypoints
         $waypointsString = !empty($waypointsArray) ? ';' . implode(';', $waypointsArray) : '';
-        $url = "http://localhost:5000/route/v1/driving/{$startLon},{$startLat}{$waypointsString};{$endLon},{$endLat}?overview=full&geometries=geojson";
+        $url = "http://localhost:5000/route/v1/driving/{$firstTripStartLon},{$firstTripStartLat}{$waypointsString};{$lastTripEndLon},{$lastTripEndLat}?overview=full&geometries=geojson";
 
         $response = Http::get($url);
     
