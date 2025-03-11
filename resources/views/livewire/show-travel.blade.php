@@ -1,7 +1,7 @@
 <div>
     <div class="mb-4">
-        <label>Départ : <input type="text" wire:model="start" placeholder="-42.0,71.0" class="border rounded p-1" /></label>
-        <label>Arrivée : <input type="text" wire:model="end" placeholder="-41.0,72.0" class="border rounded p-1" /></label>
+        <label>Départ : <input type="text"  placeholder="-42.0,71.0" class="border rounded p-1" /></label>
+        <label>Arrivée : <input type="text"  placeholder="-41.0,72.0" class="border rounded p-1" /></label>
         <label>Points intermédiaires : 
     <input type="text" wire:model="waypoints" placeholder="-41.5,71.5;-41.7,71.7" class="border rounded p-1" />
 </label>
@@ -54,6 +54,8 @@ document.addEventListener('DOMContentLoaded', function () {
         let startMarker = L.marker([routeCoordinates[0][1], routeCoordinates[0][0]]).addTo(map)
             .bindPopup("Départ");
         markers.push(startMarker);
+       
+
 
         // Ajoute les marqueurs pour les points intermédiaires
         waypoints.forEach((waypoint, index) => {
@@ -71,9 +73,23 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
     window.addEventListener('updateRoute', (event) => {
-        let routeGeoJSON = event.detail; // Récupérer les données de l'événement (la réponse de OSRM)
+        console.log("📡 Données brutes reçues de Livewire :", event.detail[0]);
+        console.log("📡 Données reçues de Livewire :", event.detail);
+
+        if (!event.detail) {
+            console.error("❌ ERREUR : Aucune donnée reçue de Livewire !");
+            return;
+        }
+
+        let routeGeoJSON = event.detail[0].routeGeoJSON; // Récupérer les données de l'événement (la réponse de OSRM)
+        let waypointsString = event.detail[0].waypoints || '';
         
-        console.log('event.detail avant conversion : ',event.detail);
+        let waypoints = waypointsString ? waypointsString.split(';') : [];
+
+
+        console.log('📍Waypoints récupérés :', waypoints);
+        console.log('🛑 Route GeoJSON :', routeGeoJSON);
+
 
         if (Array.isArray(routeGeoJSON)) { // event.detail est un tableau de coordonnées, on le convertit en GeoJSON
         routeGeoJSON = {
@@ -83,8 +99,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 "geometry": item
             }))
         };
+    } else if (routeGeoJSON.type === "LineString" && Array.isArray(routeGeoJSON.coordinates)) { 
+    // Cas où event.detail est directement un objet LineString
+    routeGeoJSON = {
+        "type": "FeatureCollection",
+        "features": [{
+            "type": "Feature",
+            "geometry": routeGeoJSON
+        }]
+    };
     }
-    console.log('event.detail après conversion : ',event.detail);
 
         if (routeLayer) {
             map.removeLayer(routeLayer); // Supprimer l'ancienne route si il'y en a une déjà affichée
@@ -95,11 +119,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Récupération de toutes les coordonnées de l'itinéraire
     const coordinates = routeGeoJSON.features[0].geometry.coordinates;
-
-    // Récupérer les waypoints depuis le composant Livewire
-    const waypoints = @js(explode(';', $waypoints)); // Assurez-vous que $waypoints est bien formaté
-
-    console.log('waypoints : ',waypoints);
 
     updateMarkers(coordinates, waypoints); // Ajout des marqueurs sur tous les points
         });

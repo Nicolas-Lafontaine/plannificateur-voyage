@@ -52,7 +52,11 @@ class ShowTravel extends Component
             $this->waypoints = implode(';', $waypointsArray);
         }
 
+        \Log::info('waypoints après le implode et avant conversion vers $waypointsString', [$this->waypoints]);
+
         $waypointsString = !empty($this->waypoints) ? ';' . $this->waypoints : '';
+
+        \Log::info('après conversion vers $waypointsString', [$waypointsString]);
 
         // Construction de l'URL pour OSRM
         $url = "http://localhost:5000/route/v1/driving/{$startLon},{$startLat}{$waypointsString};{$endLon},{$endLat}?overview=full&geometries=geojson";
@@ -65,8 +69,12 @@ class ShowTravel extends Component
             $routeGeoJSON = $response['routes'][0]['geometry'];
 
             \Log::info('Route GeoJSON:', [$routeGeoJSON]);
+            \Log::info('Waypoints envoyés à l\'événement:', [$this->waypoints]);
 
-            $this->dispatch('updateRoute', $routeGeoJSON);
+            $this->dispatch('updateRoute', [
+                'routeGeoJSON' => $routeGeoJSON,
+                'waypoints' => $this->waypoints
+            ]);
         } else {
             \Log::error('Erreur OSRM: ' . $response->body());
             session()->flash('error', 'Erreur lors de la récupération de la route.');
