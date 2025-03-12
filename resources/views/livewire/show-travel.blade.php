@@ -45,29 +45,29 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
         // Ajout des marqueurs de départ et d'arrivée
-        function updateMarkers(routeCoordinates, waypoints) {
+        function updateMarkers(routeCoordinates, waypoints, descriptions) {
+
+        console.log('Descriptions dans updateMarkers() : ' ,descriptions[0]);    
         // Supprime les anciens marqueurs
         markers.forEach(marker => map.removeLayer(marker));
         markers = [];
 
-            // Ajoute le marqueur de départ
+        // Ajoute le marqueur de départ
         let startMarker = L.marker([routeCoordinates[0][1], routeCoordinates[0][0]]).addTo(map)
             .bindPopup("Départ");
         markers.push(startMarker);
        
-
-
         // Ajoute les marqueurs pour les points intermédiaires
         waypoints.forEach((waypoint, index) => {
             let [lon, lat] = waypoint.split(',').map(coord => parseFloat(coord.trim()));
             let marker = L.marker([lat, lon]).addTo(map)
-                .bindPopup(`Point intermédiaire ${index + 1}`);
+                .bindPopup(descriptions[index]);
             markers.push(marker);
         });
 
         // Ajoute le marqueur d'arrivée
         let endMarker = L.marker([routeCoordinates[routeCoordinates.length - 1][1], routeCoordinates[routeCoordinates.length - 1][0]]).addTo(map)
-            .bindPopup("Arrivée");
+            .bindPopup(descriptions[descriptions.length - 1]);
         markers.push(endMarker);
 
         }
@@ -83,7 +83,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let routeGeoJSON = event.detail[0].routeGeoJSON; // Récupérer les données de l'événement (la réponse de OSRM)
         let waypointsString = event.detail[0].waypoints || '';
-        
+        let descriptions = event.detail[0].descriptions;
+
         let waypoints = waypointsString ? waypointsString.split(';') : [];
 
 
@@ -99,16 +100,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 "geometry": item
             }))
         };
-    } else if (routeGeoJSON.type === "LineString" && Array.isArray(routeGeoJSON.coordinates)) { 
-    // Cas où event.detail est directement un objet LineString
-    routeGeoJSON = {
-        "type": "FeatureCollection",
-        "features": [{
-            "type": "Feature",
-            "geometry": routeGeoJSON
-        }]
-    };
-    }
+        } else if (routeGeoJSON.type === "LineString" && Array.isArray(routeGeoJSON.coordinates)) { 
+        // Cas où event.detail est directement un objet LineString
+        routeGeoJSON = {
+            "type": "FeatureCollection",
+            "features": [{
+                "type": "Feature",
+                "geometry": routeGeoJSON
+            }]
+        };
+        }
 
         if (routeLayer) {
             map.removeLayer(routeLayer); // Supprimer l'ancienne route si il'y en a une déjà affichée
@@ -120,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Récupération de toutes les coordonnées de l'itinéraire
     const coordinates = routeGeoJSON.features[0].geometry.coordinates;
 
-    updateMarkers(coordinates, waypoints); // Ajout des marqueurs sur tous les points
+    updateMarkers(coordinates, waypoints, descriptions); // Ajout des marqueurs sur tous les points
         });
     });
 

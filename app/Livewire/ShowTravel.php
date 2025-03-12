@@ -12,6 +12,7 @@ class ShowTravel extends Component
     public $travel;
     public $routeData;
     public $waypoints = '';
+    public $descriptions = [];
 
     public function getRoute()
     {
@@ -20,6 +21,14 @@ class ShowTravel extends Component
         if ($trips->isEmpty()) {
             session()->flash('error', 'Aucun trajet disponible.');
             return;
+        }
+
+        // Réinitialiser le tableau des descriptions avant d'ajouter de nouvelles valeurs
+        $this->descriptions = [];
+
+        foreach ($trips as $trip) {
+            $this->descriptions[] = $trip->description;
+            \Log::info('Description ajoutée : ', [$trip->description]);
         }
 
         // Récupérer le premier et le dernier trip
@@ -68,12 +77,15 @@ class ShowTravel extends Component
         if ($response->successful() && isset($response['routes'][0]['geometry'])) {
             $routeGeoJSON = $response['routes'][0]['geometry'];
 
-            \Log::info('Route GeoJSON:', [$routeGeoJSON]);
-            \Log::info('Waypoints envoyés à l\'événement:', [$this->waypoints]);
+            \Log::info('Route GeoJSON envoyée à l\'événement: ', [$routeGeoJSON]);
+            \Log::info('Waypoints envoyés à l\'événement: ', [$this->waypoints]);
+            \Log::info('Descriptions envoyées à l\'événement: ', $this->descriptions);
+
 
             $this->dispatch('updateRoute', [
                 'routeGeoJSON' => $routeGeoJSON,
-                'waypoints' => $this->waypoints
+                'waypoints' => $this->waypoints,
+                'descriptions' => $this->descriptions
             ]);
         } else {
             \Log::error('Erreur OSRM: ' . $response->body());
