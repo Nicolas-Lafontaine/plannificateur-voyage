@@ -69,6 +69,8 @@ class ShowTravel extends Component
 
         // Construction de l'URL pour OSRM
         $url = "http://localhost:5000/route/v1/driving/{$startLon},{$startLat}{$waypointsString};{$endLon},{$endLat}?overview=full&geometries=geojson";
+        // Ajouter une url pour accéder au port 5001 qui correspondra à l'API OSRM pour les trajets à pied
+
 
         \Log::info('OSRM Request URL:', [$url]);
 
