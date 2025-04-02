@@ -4,24 +4,53 @@ namespace App\Livewire;
 
 use App\Models\Travel;
 use Livewire\Component;
+use Livewire\WithPagination;
+use Illuminate\Support\Facades\Auth;
 
 class MyTrips extends Component
 {
-    public $numbers;
-    public $travels;
+    use WithPagination;
 
+    public $minLength;
+    public $maxLength;
+    public $userId;
 
     public function mount()
     {
-        // Initialiser la variable avec une liste de nombres pour le test
-        $this->numbers = [1, 2, 3, 4, 5];
-        $query = Travel::query();
-        $this->travels = $query->get();
+        $this->minLength = null;
+        $this->maxLength = null;
+        $this->userId = Auth::id(); 
+    }
 
+    public function updating($name, $value)
+    {
+        $this->resetPage();
     }
 
     public function render()
     {
-        return view('livewire.my-trips', ['travels' => $this->travels]);
+        $query = Travel::query();
+
+        // Appliquer les filtres
+        if ($this->minLength) {
+            $query->where('total_length', '>=', $this->minLength);
+        }
+
+        if ($this->maxLength) {
+            $query->where('total_length', '<=', $this->maxLength);
+        }
+
+        if ($this->maxLength) {
+            $query->where('total_length', '<=', $this->maxLength);
+        }
+
+        if ($this->userId) {
+            $query->where('user_id', '=', intval($this->userId));
+        }
+
+        // Récupérer les résultats paginés
+        $travels = $query->paginate(5);
+
+        return view('livewire.my-trips', ['travels' => $travels]);
     }
 }
