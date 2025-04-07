@@ -4,7 +4,6 @@ namespace App\Livewire;
 
 use App\Models\Travel;
 use Illuminate\Support\Facades\Http;
-
 use Livewire\Component;
 
 class ShowTravel extends Component
@@ -16,22 +15,17 @@ class ShowTravel extends Component
 
     public function getRoute()
     {
-        $trips = $this->travel->trips;
+        $trips = $this->travel->trips()->orderBy('order_number')->get();
 
         if ($trips->isEmpty()) {
             session()->flash('error', 'Aucun trajet disponible.');
             return;
         }
 
-        // Réinitialiser le tableau des descriptions avant d'ajouter de nouvelles valeurs
         $this->descriptions = [];
+        $routeGeoJSON = ["type" => "FeatureCollection", "features" => []];
 
-        foreach ($trips as $trip) {
-            $this->descriptions[] = $trip->description;
-            \Log::info('Description ajoutée : ', [$trip->description]);
-        }
-
-        // Récupérer le premier et le dernier trip
+        // Récupération des waypoints
         $firstTrip = $trips->first();
         $lastTrip = $trips->last();
 
@@ -39,7 +33,12 @@ class ShowTravel extends Component
         $startLon = $firstTrip->departureLocation->longitude;
         $endLat = $lastTrip->arrivalLocation->latitude;
         $endLon = $lastTrip->arrivalLocation->longitude;
+        \Log::info('First Trip départ : ', [$firstTrip->departureLocation->longitude]);
+        \Log::info('Last Trip fin : ', [$lastTrip->arrivalLocation->longitude]);
 
+        
+        
+        
         if ($trips->count() == 1) {
             // Cas où il n'y a qu'un seul trip → pas de waypoints
             $this->waypoints = '';
@@ -61,42 +60,61 @@ class ShowTravel extends Component
             $this->waypoints = implode(';', $waypointsArray);
         }
 
-        \Log::info('waypoints après le implode et avant conversion vers $waypointsString', [$this->waypoints]);
-
         $waypointsString = !empty($this->waypoints) ? ';' . $this->waypoints : '';
 
-        \Log::info('après conversion vers $waypointsString', [$waypointsString]);
+        \Log::info('Waypoints générés : ', [$this->waypoints]);
 
-        // Construction de l'URL pour OSRM
-        $url = "http://localhost:5000/route/v1/driving/{$startLon},{$startLat}{$waypointsString};{$endLon},{$endLat}?overview=full&geometries=geojson";
-        // Ajouter une url pour accéder au port 5001 qui correspondra à l'API OSRM pour les trajets à pied
+        foreach ($trips as $index => $trip) {
+            $this->descriptions[] = $trip->description;
 
+            \Log::info("Type de transport pour le trip #{$trip->order_number} :", [$trip->transportation->name]);
 
-        \Log::info('OSRM Request URL:', [$url]);
+            // Déterminer le profil de transport et le port OSRM
+            $profile = ($trip->transportation->name === 'foot') ? 'foot' : 'driving';
+            $osrmPort = ($profile === 'foot') ? 5001 : 5000;
 
-        $response = Http::get($url);
+            // Récupération des valeurs de longitude et latitude de départ et d'arrivée
+            $departureLat = $trip->departureLocation->latitude;
+            $departureLon = $trip->departureLocation->longitude;
+            $arrivalLat = $trip->arrivalLocation->latitude;
+            $arrivalLon = $trip->arrivalLocation->longitude;
+            \Log::info('Départ longitude : ', [$departureLon]);
+            \Log::info('Arrivée longitude : ', [$arrivalLon]);
 
-        if ($response->successful() && isset($response['routes'][0]['geometry'])) {
-            $routeGeoJSON = $response['routes'][0]['geometry'];
+            // Construire l'URL OSRM avec les waypoints
+            $url = "http://localhost:{$osrmPort}/route/v1/{$profile}/{$departureLon},{$departureLat};{$arrivalLon},{$arrivalLat}?overview=full&geometries=geojson";
 
-            \Log::info('Route GeoJSON envoyée à l\'événement: ', [$routeGeoJSON]);
-            \Log::info('Waypoints envoyés à l\'événement: ', [$this->waypoints]);
-            \Log::info('Descriptions envoyées à l\'événement: ', $this->descriptions);
+            \Log::info("Requête OSRM pour le trip #{$trip->order_number} :", [$url]);
 
+            $response = Http::get($url);
 
-            $this->dispatch('updateRoute', [
-                'routeGeoJSON' => $routeGeoJSON,
-                'waypoints' => $this->waypoints,
-                'descriptions' => $this->descriptions
-            ]);
-        } else {
-            \Log::error('Erreur OSRM: ' . $response->body());
-            session()->flash('error', 'Erreur lors de la récupération de la route.');
+            if ($response->successful() && isset($response['routes'][0]['geometry'])) {
+                $tripGeoJSON = [
+                    "type" => "Feature",
+                    "geometry" => $response['routes'][0]['geometry'],
+                    "properties" => ["mode" => $trip->transportation->name]
+                ];
+
+                $routeGeoJSON["features"][] = $tripGeoJSON;
+            } else {
+                \Log::error("Erreur OSRM sur le trip #{$index} : " . $response->body());
+                session()->flash('error', "Erreur sur le trip #{$index}.");
+                return;
+            }
         }
-    }
-    
 
-   
+        \Log::info('--------------------------------------------------');
+        \Log::info('Route complète envoyée :', [$routeGeoJSON]);
+        \Log::info('Descriptions collectées:', $this->descriptions);
+        \Log::info('Waypoints avant l\'envoi :', [$this->waypoints]);
+        
+        // Dispatch l'événement avec toutes les routes fusionnées et les waypoints
+        $this->dispatch('updateRoute', [
+            'routeGeoJSON' => $routeGeoJSON,
+            'waypoints' => $this->waypoints,
+            'descriptions' => $this->descriptions
+        ]);
+    }
 
     public function mount($id)
     {

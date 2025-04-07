@@ -12,65 +12,17 @@ class TripSeeder extends Seeder
     public function run()
     {
         $trips = [
-            [
-                'travel_id' => 15, 
-                'arrival_location' => 56, 
-                'departure_location' => 55, 
-                'transportation_id' => 1, 
+            [   
+                'travel_id' => 19, 
+                'arrival_location' => 63, 
+                'departure_location' => 62, 
+                'transportation_id' => 6, 
                 'days_spent_at_destination' => 0,
-                'length_in_km' => 200.5,
-                'duration_estimated' => '02:00:00',
-                'description' => 'Arrivée à Ottawa',
-                'departure_date' => '2024-07-30 08:00:00',
-                'pictures' => 'canada1.jpg'
-            ],
-            [
-                'travel_id' => 15, 
-                'arrival_location' => 57, 
-                'departure_location' => 56, 
-                'transportation_id' => 1, 
-                'days_spent_at_destination' => 1,
-                'length_in_km' => 200.5,
-                'duration_estimated' => '02:00:00',
-                'description' => 'Arrivée à Toronto',
-                'departure_date' => '2024-07-30 08:00:00',
-                'pictures' => 'canada1.jpg'
-            ],
-            [
-                'travel_id' => 15, 
-                'arrival_location' => 58, 
-                'departure_location' => 57, 
-                'transportation_id' => 1, 
-                'days_spent_at_destination' => 1,
-                'length_in_km' => 200.5,
-                'duration_estimated' => '02:00:00',
-                'description' => 'Arrivée à Winnipeg',
-                'departure_date' => '2024-07-30 08:00:00',
-                'pictures' => 'canada1.jpg'
-            ],
-            [
-                'travel_id' => 15, 
-                'arrival_location' => 59, 
-                'departure_location' => 58, 
-                'transportation_id' => 1, 
-                'days_spent_at_destination' => 2,
-                'length_in_km' => 200.5,
-                'duration_estimated' => '02:00:00',
-                'description' => 'Arrivée à Calgary',
-                'departure_date' => '2024-07-30 08:00:00',
-                'pictures' => 'canada1.jpg'
-            ],
-            [
-                'travel_id' => 15, 
-                'arrival_location' => 60, 
-                'departure_location' => 59, 
-                'transportation_id' => 1, 
-                'days_spent_at_destination' => 7,
-                'length_in_km' => 200.5,
-                'duration_estimated' => '02:00:00',
-                'description' => 'Arrivée à Vancouver',
-                'departure_date' => '2024-07-30 08:00:00',
-                'pictures' => 'canada1.jpg'
+                'length_in_km' => 2,
+                'duration_estimated' => '00:30:00',     
+                'description' => 'Accès à pied au sentier de Machu Picchu',
+                'departure_date' => '2024-07-30 09:00:00',
+                'pictures' => 'machupichu1.jpg'
             ],
         ];
 

@@ -15,7 +15,7 @@ class TravelSeeder extends Seeder
     public function run()
     {
         $travels = [
-            ['user_id' => 2, 'name' => 'Voyage privé Utilisateur 2', 'total_length' => 950.45],
+            ['user_id' => 2, 'name' => '(TEST FOOT) Machu Pichu', 'total_length' => 50.45],
         ];
 
         foreach ($travels as $travel) {

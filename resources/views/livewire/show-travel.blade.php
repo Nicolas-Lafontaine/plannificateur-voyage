@@ -47,7 +47,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // Ajout des marqueurs de départ et d'arrivée
         function updateMarkers(routeCoordinates, waypoints, descriptions) {
 
-        console.log('Descriptions dans updateMarkers() : ' ,descriptions[0]);    
         // Supprime les anciens marqueurs
         markers.forEach(marker => map.removeLayer(marker));
         markers = [];
@@ -56,6 +55,8 @@ document.addEventListener('DOMContentLoaded', function () {
         let startMarker = L.marker([routeCoordinates[0][1], routeCoordinates[0][0]]).addTo(map)
             .bindPopup("Départ");
         markers.push(startMarker);
+
+        console.log('1er marqueurs ajouté pour les coordonnées : ' ,routeCoordinates[0][1], routeCoordinates[0][0]); 
        
         // Ajoute les marqueurs pour les points intermédiaires
         waypoints.forEach((waypoint, index) => {
@@ -69,7 +70,6 @@ document.addEventListener('DOMContentLoaded', function () {
         let endMarker = L.marker([routeCoordinates[routeCoordinates.length - 1][1], routeCoordinates[routeCoordinates.length - 1][0]]).addTo(map)
             .bindPopup(descriptions[descriptions.length - 1]);
         markers.push(endMarker);
-
         }
 
     window.addEventListener('updateRoute', (event) => {
@@ -86,11 +86,6 @@ document.addEventListener('DOMContentLoaded', function () {
         let descriptions = event.detail[0].descriptions;
 
         let waypoints = waypointsString ? waypointsString.split(';') : [];
-
-
-        console.log('📍Waypoints récupérés :', waypoints);
-        console.log('🛑 Route GeoJSON :', routeGeoJSON);
-
 
         if (Array.isArray(routeGeoJSON)) { // event.detail est un tableau de coordonnées, on le convertit en GeoJSON
         routeGeoJSON = {
@@ -119,9 +114,18 @@ document.addEventListener('DOMContentLoaded', function () {
         map.fitBounds(routeLayer.getBounds()); // Ajuster la vue pour voir tout le tracé de l'itinéraire
 
             // Récupération de toutes les coordonnées de l'itinéraire
-    const coordinates = routeGeoJSON.features[0].geometry.coordinates;
+            const allCoordinates = [];
 
-    updateMarkers(coordinates, waypoints, descriptions); // Ajout des marqueurs sur tous les points
+        // Itérer sur chaque feature et concaténer les coordonnées
+        routeGeoJSON.features.forEach(feature => {
+            // Vérifier si la géométrie et les coordonnées existent
+            if (feature.geometry && feature.geometry.coordinates) {
+                // Concaténer les coordonnées dans le tableau allCoordinates
+                allCoordinates.push(...feature.geometry.coordinates);
+            }
+        });
+
+    updateMarkers(allCoordinates, waypoints, descriptions); // Ajout des marqueurs sur tous les points
         });
     });
 
