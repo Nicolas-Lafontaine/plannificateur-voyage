@@ -6,6 +6,7 @@ use App\Livewire\SearchItinerary;
 use App\Livewire\MyTrips;
 use App\Livewire\Trends;
 use App\Livewire\ShowTravel;
+use App\Livewire\NewTravel;
 
 
 
@@ -38,6 +39,10 @@ Route::get('/mytrips', function () {
     return view('mytripsview');
 })->name('mytrips');
 
+Route::get('/new-travel', function () {
+    return view('newtravelview');
+})->name('new-travel');
+
 Route::get('/trends!', function () {
     return view('trendsview');
 })->name('trends!');
@@ -45,6 +50,9 @@ Route::get('/trends!', function () {
 Route::get('/travels/{id}', function($id) {
     return view('travels.show', ['id' => $id]);
 })->name('travels.show');
+
+        // Route pour le composant Livewire NewTravel
+        Route::get('/new-travel', NewTravel::class)->name('new-travel');
 
         // Route pour le composant Livewire MyTrips
         Route::get('/my-trips', MyTrips::class)->name('my-trips');

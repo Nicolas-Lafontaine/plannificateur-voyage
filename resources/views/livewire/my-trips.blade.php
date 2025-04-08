@@ -13,9 +13,17 @@
                     <input type="number" wire:model.lazy="minLength" placeholder="Longueur minimale (en km)" class="w-full p-2 border rounded">
                     <input type="number" wire:model.lazy="maxLength" placeholder="Longueur maximale (en km)" class="w-full p-2 border rounded mt-2">
                 </div>
+
+
                 <button class="bg-blue-500 text-white px-4 py-2 rounded" wire:click="render">Filtrer</button>
             </div>
+            <a href="" style="display: inline-block; padding: 15px 30px; font-size: 18px; color: white; background-color: blue; border: none; border-radius: 5px; text-decoration: none; cursor: pointer;">
+                Créer un nouvel itinéraire
+            </a>
         </div>
+
+
+
 
         <!-- Cartes des voyages -->
         <div class="row">
@@ -42,4 +50,9 @@
             {{ $travels->links() }}
         </div>
     </div>
+    <!-- Bouton flottant rond centré en bas -->
+    <a href="{{ route('new-travel') }}" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; font-size: 24px; color: white; background-color: blue; border: none; border-radius: 50%; text-decoration: none; cursor: pointer; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); z-index: 1000;">
+        +
+    </a>
 </div>
+
