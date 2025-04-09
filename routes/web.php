@@ -7,7 +7,8 @@ use App\Livewire\MyTrips;
 use App\Livewire\Trends;
 use App\Livewire\ShowTravel;
 use App\Livewire\NewTravel;
-
+use App\Livewire\EditTravel;
+use App\Livewire\EditTrip;
 
 
 Route::get('/', function () {
@@ -43,6 +44,14 @@ Route::get('/new-travel', function () {
     return view('newtravelview');
 })->name('new-travel');
 
+Route::get('/edit-travel/{id}', function () {
+    return view('edittravelview', ['id' => $id]);
+})->name('edit-travel');
+
+Route::get('/edit-trip/{id}', function () {
+    return view('edittripview', ['id' => $id]);
+})->name('edit-trip');
+
 Route::get('/trends!', function () {
     return view('trendsview');
 })->name('trends!');
@@ -53,6 +62,11 @@ Route::get('/travels/{id}', function($id) {
 
         // Route pour le composant Livewire NewTravel
         Route::get('/new-travel', NewTravel::class)->name('new-travel');
+
+        // Route pour le composant Livewire NewTravel
+        Route::get('/edit-travel/{id}', EditTravel::class)->name('edit-travel');
+
+        Route::get('/edit-trip/{id}', EditTrip::class)->name('edit-trip');
 
         // Route pour le composant Livewire MyTrips
         Route::get('/my-trips', MyTrips::class)->name('my-trips');

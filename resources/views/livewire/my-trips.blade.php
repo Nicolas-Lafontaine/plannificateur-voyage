@@ -35,6 +35,7 @@
                             <h5 class="card-title">{{ $travel->name }}</h5>
                             <p class="card-text">Distance totale : {{ $travel->total_length }} km</p>
                             <a href="{{ route('travels.show', $travel->id) }}" class="btn btn-primary">Voir</a>
+                            <a href="{{ route('edit-travel', $travel->id) }}" class="btn btn-primary">Modifier</a>
                         </div>
                     </div>
                 </div>
