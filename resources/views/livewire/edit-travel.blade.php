@@ -17,7 +17,7 @@
             <tr>
                 <td>{{ $trip->description }}</td>
                 <td>{{ $trip->length_in_km }} km</td>
-                <td>{{ 'À ajouter dans DB'}} </td>
+                <td>{{ $trip->departure_date->format('Y-m-d')}} </td>
                 <td>{{ $trip->transportation->name }}</td>
                 <td>{{ $trip->days_spent_at_destination }}</td>
                 <td>

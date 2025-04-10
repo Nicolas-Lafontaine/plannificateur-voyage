@@ -13,6 +13,10 @@ class Trip extends Model
         'travel_id','arrival_location', 'departure_location', 'transportation_id', 'commentary_id', 'days_spent_at_destination', 'length_in_km', 'duration_estimated', 'description', 'pictures',
     ];
 
+    protected $casts = [
+        'departure_date' => 'date',
+    ];    
+
     public function arrivalLocation()
     {
         return $this->belongsTo(Location::class, 'arrival_location');
