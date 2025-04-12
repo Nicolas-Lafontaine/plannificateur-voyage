@@ -64,6 +64,8 @@ class ShowTravel extends Component
 
         \Log::info('Waypoints générés : ', [$this->waypoints]);
 
+        $this->travel->total_length = 0;
+
         foreach ($trips as $index => $trip) {
             $this->descriptions[] = $trip->description;
 
@@ -89,6 +91,17 @@ class ShowTravel extends Component
             $response = Http::get($url);
 
             if ($response->successful() && isset($response['routes'][0]['geometry'])) {
+
+                $distanceInMeters = $response['routes'][0]['distance'];
+                $distanceInKm = round($distanceInMeters / 1000, 2);
+        
+                $trip->length_in_km = $distanceInKm;
+                $trip->save();
+                $this->travel->total_length = $this->travel->total_length + $distanceInKm;
+        
+                \Log::info("Distance pour le trip #{$trip->order_number} : {$distanceInKm} km");
+        
+
                 $tripGeoJSON = [
                     "type" => "Feature",
                     "geometry" => $response['routes'][0]['geometry'],
@@ -102,6 +115,7 @@ class ShowTravel extends Component
                 return;
             }
         }
+        $this->travel->save();
 
         \Log::info('--------------------------------------------------');
         \Log::info('Route complète envoyée :', [$routeGeoJSON]);
