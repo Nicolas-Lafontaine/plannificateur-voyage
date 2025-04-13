@@ -7,6 +7,7 @@
                 <th>Distance avec étape précédente</th>
                 <th>Date prévue</th>
                 <th>Transport utilisé</th>
+                <th>Émission de CO2 (kg)</th>
                 <th>Jours sur place</th>
                 <th>Supprimer</th>
                 <th>Modifier</th>
@@ -19,6 +20,7 @@
                 <td>{{ $trip->length_in_km }} km</td>
                 <td>{{ $trip->departure_date->format('Y-m-d')}} </td>
                 <td>{{ $trip->transportation->name }}</td>
+                <td>{{ number_format($trip->co2_emission_in_kg, 2) }}</td>
                 <td>{{ $trip->days_spent_at_destination }}</td>
                 <td>
                     <button wire:click="deleteTrip({{ $trip->id }})" class="btn btn-danger btn-sm"
@@ -40,10 +42,10 @@
 
     <div class="d-flex justify-content-between mt-6">
         <div>
-            <strong>Distance totale du voyage :</strong> {{ number_format($total_length) }} km
+            <strong>Distance totale du voyage :</strong> {{ number_format($total_length,2) }} km
         </div>
         <div>
-            <strong>Émission totale du CO2 :</strong> {{ number_format($total_co2_emission_in_kg, 2) }} kg
+            <strong>Émission totale de CO2 :</strong> {{ number_format($total_co2_emission_in_kg, 2) }} kg
         </div>
     </div>
 
