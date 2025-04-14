@@ -93,7 +93,7 @@ class ShowTravel extends Component
             if ($response->successful() && isset($response['routes'][0]['geometry'])) {
 
                 $distanceInMeters = $response['routes'][0]['distance'];
-                $distanceInKm = round($distanceInMeters / 1000, 2);
+                $distanceInKm = $distanceInMeters / 1000;
         
                 $trip->length_in_km = $distanceInKm;
                 $trip->save();

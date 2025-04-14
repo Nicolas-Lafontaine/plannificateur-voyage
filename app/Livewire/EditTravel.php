@@ -37,14 +37,16 @@ class EditTravel extends Component
 
         foreach ($this->trips as $trip) {
             $this->total_length += $trip->length_in_km;
+            \Log::info('Distance totale du trip  : ', [$trip->length_in_km]);
             $trip->co2_emission_in_kg = ($trip->transportation->co2_emission_per_km_grams * $trip->length_in_km) / 1000;
+            \Log::info('Émission co2 du trip  : ', [$trip->co2_emission_in_kg]);
             $trip->save();
             $this->total_co2_emission_in_kg += $trip->co2_emission_in_kg;
         }
 
         // Ajouter le total au voyage
         $this->travel->total_length = $this->total_length;
-        //TO DO : Ajouter le total CO2 au voyage
+        $this->travel->total_co2_emission_in_kg = $this->total_co2_emission_in_kg;
         $this->travel->save();  
     }    
 

@@ -26,6 +26,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ $travel->name }}</h5>
                             <p class="card-text">Distance totale : {{ $travel->total_length }} km</p>
+                            <p class="card-text">Impact Co2 : {{ $travel->total_co2_emission_in_kg }} km</p>
                             <a href="{{ route('travels.show', $travel->id) }}" class="btn btn-primary">Voir</a>
                         </div>
                     </div>
