@@ -25,8 +25,9 @@
                         <img src="https://picsum.photos/150" class="card-img-top" alt="Image">
                         <div class="card-body">
                             <h5 class="card-title">{{ $travel->name }}</h5>
-                            <p class="card-text">Distance totale : {{ $travel->total_length }} km</p>
-                            <p class="card-text">Impact Co2 : {{ $travel->total_co2_emission_in_kg }} km</p>
+                            <p class="card-text">Distance totale : {{ number_format($travel->total_length, 2) }} km</p>
+                            <p class="card-text">Impact Co2 : {{ number_format($travel->total_co2_emission_in_kg, 2) }} kg</p>
+                            <p class="card-text">Durée totale : {{ $travel->total_duration }} jours</p>
                             <a href="{{ route('travels.show', $travel->id) }}" class="btn btn-primary">Voir</a>
                         </div>
                     </div>
