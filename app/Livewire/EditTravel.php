@@ -83,8 +83,10 @@ class EditTravel extends Component
     {
         $this->travel = Travel::findOrFail($id);
         $this->trips = $this->travel->trips()->orderBy('order_number')->get();
-        $this->calculateDepartureDatesForTrips();
-        $this->calculateTotal();
+        if ($this->travel->trips()->count() > 0) {
+            $this->calculateDepartureDatesForTrips();
+            $this->calculateTotal();    
+        }
     }
 
     public function render()
