@@ -8,7 +8,7 @@
         <div class="carousel-inner">
             @foreach($latestTravels as $index => $travel)
                 <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                <img class="d-block w-100 carousel-image" src="{{ $travel->image_url }}" alt="{{ $travel->name }}">
+                <img class="d-block w-100 carousel-image" src="{{ $travel->image_url_carrousel }}" alt="{{ $travel->name }}">
                     <div class="carousel-caption d-none d-md-block">
                         <h5>{{ $travel->name }}</h5>
                         <p>{{ $travel->total_length }} km</p>

@@ -19,7 +19,7 @@ class NewTravel extends Component
         $travel->user_id = auth()->id();
         $travel->name = $this->travelName;
         $travel->total_length = 0;
-        $travel->image_url = "images/travels/default_travel_image.jpg";
+        $travel->image_url_carrousel = "images/travels/default_travel_image_carrousel.jpg";
         $travel->public = $this->isPublic ? 1 : 0; 
         $travel->save();
     }

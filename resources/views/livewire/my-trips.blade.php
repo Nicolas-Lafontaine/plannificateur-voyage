@@ -30,7 +30,7 @@
             @forelse ($travels as $travel)
                 <div class="col-12 col-md-6 col-lg-4 mb-4">
                     <div class="card h-100">
-                        <img src="https://picsum.photos/150" class="card-img-top" alt="Image">
+                        <img src="{{ $travel->image_url_card }}" alt="{{ $travel->name }}">
                         <div class="card-body">
                             <h5 class="card-title">{{ $travel->name }}</h5>
                             <p class="card-text">Distance totale : {{ number_format($travel->total_length, 2) }} km</p>
