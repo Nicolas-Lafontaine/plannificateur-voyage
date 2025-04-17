@@ -48,7 +48,10 @@
             <strong>Émission totale de CO2 :</strong> {{ number_format($total_co2_emission_in_kg, 2) }} kg
         </div>
     </div>
-
+    <!-- Bouton flottant rond centré en bas -->
+    <a href="{{ route('new-trip', $travel->id) }}" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; font-size: 24px; color: white; background-color: blue; border: none; border-radius: 50%; text-decoration: none; cursor: pointer; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); z-index: 1000;">
+        +
+    </a>
 </div>
 
 
