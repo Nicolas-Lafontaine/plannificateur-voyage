@@ -13,7 +13,10 @@ class NewTrip extends Component
 {
     public $travelID;
     public $transportationName;
+    public $transportation;
     public $departureLocation;
+    public $departure;
+    public $arrival;
     public $arrivalLocation;
     public $daysSpentAtDestination;
     public $description;
@@ -38,71 +41,41 @@ class NewTrip extends Component
 
     public function updateDepartureLocation($value)
     {
-        // Ajoutez une vérification pour voir ce que vous recevez
-        \Log::info('Valeur reçue pour departureLocation', ['value' => $value]);
-        \Log::info( $value);
-        $this->departureLocation = $value; // Assurez-vous que $value est bien une chaîne ou un tableau
+        $this->departureLocation = $value;
     }
     
     public function updateArrivalLocation($value)
     {
-        // Ajoutez une vérification pour voir ce que vous recevez
-        \Log::info('Valeur reçue pour arrivalLocation', ['value' => $value]);
-        $this->arrivalLocation = $value; // Assurez-vous que $value est bien une chaîne ou un tableau
+        $this->arrivalLocation = $value; 
     }
-    
-    
-    
 
-    public function submit()
+    public function createLocations()
     {
-        \Log::info('transportation: ' . $this->transportationName);
-        \Log::info('departureLocation: ' . $this->departureLocation);
-        \Log::info('arrivalLocation: ' . $this->arrivalLocation);
-        \Log::info('daysSpentAtDestination: ' . $this->daysSpentAtDestination);
-        \Log::info('description: ' . $this->description);
-        \Log::info('travelID: ' . $this->travelID);
-        \Log::info('submit() called');
-        // $this->validate([
-        //     'transportation' => 'required',
-        //     'departureLocation' => 'required',
-        //     'arrivalLocation' => 'required',
-        //     'daysSpentAtDestination' => 'required|integer|min:0',
-        //     'description' => 'nullable|string|max:255',
-        // ]);
-
-    
         [$departureLat, $departureLng] = explode(',', $this->departureLocation);
         [$arrivalLat, $arrivalLng] = explode(',', $this->arrivalLocation);
-
-        \Log::info('departureLat: ' . $departureLat);
-        \Log::info('departureLng: ' . $departureLng);
-        \Log::info('arrivalLat: ' . $arrivalLat);
-        \Log::info('arrivalLng: ' . $arrivalLng);
     
-        $departure = Location::firstOrCreate([
+        $this->departure = Location::firstOrCreate([
             'latitude' => $departureLat,
             'longitude' => $departureLng,
             'country_id' => 1
         ]);
-        $departure->save();
+        $this->departure->save();
 
-        $arrival = Location::firstOrCreate([
+        $this->arrival = Location::firstOrCreate([
             'latitude' => $arrivalLat,
             'longitude' => $arrivalLng,
             'country_id' => 1
         ]);
-        $arrival->save();
+        $this->arrival->save();
+    }
 
-        $transportation = Transportation::where('name', $this->transportationName)->first();
-        \Log::info($this->transportationName);
-
-    
+    public function createTrip()
+    {
         $trip = Trip::create([
             'travel_id' => $this->travelID,
-            'transportation_id' => $transportation->id,
-            'departure_location' => $departure->id,
-            'arrival_location' => $arrival->id,
+            'transportation_id' => $this->transportation->id,
+            'departure_location' => $this->departure->id,
+            'arrival_location' => $this->arrival->id,
             'days_spent_at_destination' => $this->daysSpentAtDestination,
             'description' => $this->description,
             //TO DO : Calculer la distance entre les deux points pour déterminer lenght_in_km
@@ -118,9 +91,51 @@ class NewTrip extends Component
             'pictures' => 'default.jpg',
         ]);
         $trip->save();
-        session()->flash('success', 'Étape ajoutée avec succès !');
+    }
+
+    public function rules()
+    {
+        return [
+            'departureLocation' => 'required|string',
+            'arrivalLocation' => 'required|string|different:departureLocation',
+            'transportationName' => 'required|in:driving,train,foot,bike',
+            'daysSpentAtDestination' => 'required|integer|min:0|max:365',
+            'description' => 'required|string|min:5|max:255',
+        ];
+    }
     
-        // Optionnel : reset les champs
+    public function messages()
+    {
+        return [
+            'departureLocation.required' => 'Le lieu de départ est requis.',
+            'arrivalLocation.required' => 'Le lieu d\'arrivée est requis.',
+            'arrivalLocation.different' => 'Le lieu d\'arrivée doit être différent du lieu de départ.',
+            'transportationName.required' => 'Veuillez sélectionner un moyen de transport.',
+            'transportationName.in' => 'Le moyen de transport sélectionné n\'est pas valide.',
+            'daysSpentAtDestination.required' => 'Le nombre de jours passés est requis.',
+            'daysSpentAtDestination.integer' => 'Le nombre de jours doit être un entier.',
+            'daysSpentAtDestination.min' => 'Le nombre de jours ne peut pas être négatif.',
+            'daysSpentAtDestination.max' => 'Le nombre de jours est trop élevé.',
+            'description.required' => 'Une description est requise.',
+            'description.min' => 'La description doit contenir au moins :min caractères.',
+            'description.max' => 'La description ne peut pas dépasser :max caractères.',
+        ];
+    }
+    
+
+    public function submit()
+    {        
+        $validated = $this->validate();
+
+        $this->createLocations();
+
+        $this->transportation = Transportation::where('name', $this->transportationName)->first();
+    
+        $this->createTrip();
+
+        session()->flash('message', 'Étape ajoutée avec succès !');
+
+    
         $this->reset(['departureLocation', 'arrivalLocation', 'transportationName', 'daysSpentAtDestination', 'description']);
     }
     

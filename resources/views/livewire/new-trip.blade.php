@@ -7,34 +7,45 @@
 
     <form wire:submit.prevent="submit" class="border p-4 rounded shadow" style="width: 400px;">
         
+        @if (session()->has('message'))
+        <div class="text-green-500 font-semibold mb-4">
+            {{ session('message') }}
+        </div>
+        @endif
+
         <div class="form-group">
             <label for="departureLocation">Départ :</label>
             <input type="text" id="departureLocation" wire:model="departureLocation" class="form-control" required>
+            @error('departureLocation') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
 
         <div class="form-group">
             <label for="arrivalLocation">Arrivée :</label>
             <input type="text" id="arrivalLocation" wire:model="arrivalLocation" class="form-control" required>
+            @error('arrivalLocation') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
 
         <div class="form-group">
             <label for="transportationName">Transport :</label>
             <select id="transportationName" name="transportationName" class="border rounded p-1" wire:model="transportationName">
+                <option value=""></option>
                 <option value="driving">Voiture</option>
-                <option value="train">Train</option>
                 <option value="foot">Marche</option>
                 <option value="bike">Vélo</option>
             </select>
+            @error('transportationName') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
 
         <div class="form-group">
             <label for="daysSpentAtDestination">Jours passés : </label>
             <input type="number" id="daysSpentAtDestination" name="daysSpentAtDestination" wire:model="daysSpentAtDestination" min="0" required class="border rounded p-1" />
+            @error('daysSpentAtDestination') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror 
         </div>
 
         <div class="form-group">
             <label for="description">Description :</label>
             <input type="text" id="description" wire:model="description" class="form-control" required>
+            @error('description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
 
 
