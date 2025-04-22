@@ -48,6 +48,15 @@
             @error('description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
 
+        @if($isFirstTrip)
+        <div class="form-group">
+            <label for="customDepartureDate">Date de départ de votre voyage :</label>
+            <input type="date" id="customDepartureDate" wire:model="customDepartureDate" class="form-control" required>
+            <small class="form-text text-muted">Choisissez la date de départ de votre tout premier trajet.</small>
+            @error('customDepartureDate') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+        </div>
+        @endif
+
 
         <button type="submit" class="btn btn-primary btn-block">Soumettre</button>
     </form>

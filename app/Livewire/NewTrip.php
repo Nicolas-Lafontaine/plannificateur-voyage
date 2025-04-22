@@ -20,18 +20,20 @@ class NewTrip extends Component
     public $arrivalLocation;
     public $daysSpentAtDestination;
     public $description;
-    
-    // TO DO : Prendre en compte les dates de départ et d'arrivée lors de la création d'un trip
-    // en se basant sur la date de départ du trip précédent, si pas de trip, alors prendre la date d'ajourd'hui
-    // pour $departureDate et ajouter les jours de $daysSpentAtDestination pour $arrivalDate
-
-    // public $departureDate;
-    // public $arrivalDate;
+    public $departureDate;
+    public $customDepartureDate;
+    public $isFirstTrip = false;
 
     public function mount($id)
     {
         $this->travel = Travel::findOrFail($id);
         $this->travelID = $this->travel->id;
+
+        $lastTrip = Trip::where('travel_id', $this->travelID)->orderBy('departure_date', 'desc')->first();
+
+        if (!$lastTrip) {
+            $this->isFirstTrip = true;
+        }
     }
 
     protected $listeners = [
@@ -70,7 +72,7 @@ class NewTrip extends Component
     }
 
     public function createTrip()
-    {
+    {        
         $trip = Trip::create([
             'travel_id' => $this->travelID,
             'transportation_id' => $this->transportation->id,
@@ -80,9 +82,7 @@ class NewTrip extends Component
             'description' => $this->description,
             //TO DO : Calculer la distance entre les deux points pour déterminer lenght_in_km
             'length_in_km' => 333,
-            //TO DO : Calculer la date de départ et d'arrivée en fonction de la date d'arrivée du précédent trip, si pas de trip précédent alors choisir la date d'aujourd'hui
-            // 'departure_date' => $departure_date,
-            // 'arrival_date' => $arrival_date,
+            'departure_date' => $this->departureDate->format('Y-m-d'), // ou toDateString()
             // TO DO : Calculer l'émission de CO2 en fonction du mode de transport et de la distance
             'co2_emission_in_kg' => 333,
             // TO DO : Attribuer un order_number en fonction de l'ordre des trips
@@ -95,14 +95,21 @@ class NewTrip extends Component
 
     public function rules()
     {
-        return [
+        $rules = [
             'departureLocation' => 'required|string',
             'arrivalLocation' => 'required|string|different:departureLocation',
             'transportationName' => 'required|in:driving,train,foot,bike',
             'daysSpentAtDestination' => 'required|integer|min:0|max:365',
             'description' => 'required|string|min:5|max:255',
         ];
+    
+        if ($this->isFirstTrip) {
+            $rules['customDepartureDate'] = 'required|date|after_or_equal:today';
+        }
+    
+        return $rules;
     }
+    
     
     public function messages()
     {
@@ -119,14 +126,26 @@ class NewTrip extends Component
             'description.required' => 'Une description est requise.',
             'description.min' => 'La description doit contenir au moins :min caractères.',
             'description.max' => 'La description ne peut pas dépasser :max caractères.',
+            'customDepartureDate.required' => 'La date de départ est requise.',
+            'customDepartureDate.date' => 'La date de départ doit être une date valide.',
+            'customDepartureDate.after_or_equal' => 'La date de départ doit être aujourd\'hui ou dans le futur.',
         ];
     }
-    
 
     public function submit()
     {        
         $validated = $this->validate();
 
+        $lastTrip = Trip::where('travel_id', $this->travelID)->orderBy('departure_date', 'desc')->first();
+
+        if ($lastTrip) {
+            $lastDate = Carbon::parse($lastTrip->departure_date);
+            $this->departureDate = $lastDate->addDays($lastTrip->days_spent_at_destination);
+        } else {
+            $newDate = Carbon::parse($this->customDepartureDate);
+            $this->departureDate = $newDate;
+        }
+        
         $this->createLocations();
 
         $this->transportation = Transportation::where('name', $this->transportationName)->first();
@@ -135,8 +154,9 @@ class NewTrip extends Component
 
         session()->flash('message', 'Étape ajoutée avec succès !');
 
-    
-        $this->reset(['departureLocation', 'arrivalLocation', 'transportationName', 'daysSpentAtDestination', 'description']);
+        $this->isFirstTrip = false;
+
+        $this->reset(['departureLocation', 'arrivalLocation', 'transportationName', 'daysSpentAtDestination', 'description', 'customDepartureDate']);
     }
     
 

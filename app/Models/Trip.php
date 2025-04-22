@@ -10,7 +10,7 @@ class Trip extends Model
     use HasFactory;
 
     protected $fillable = [
-        'travel_id','arrival_location', 'departure_location', 'transportation_id', 'commentary_id', 'days_spent_at_destination', 'length_in_km', 'duration_estimated', 'description', 'pictures',
+        'travel_id','arrival_location', 'departure_location', 'transportation_id', 'departure_date', 'days_spent_at_destination', 'length_in_km', 'duration_estimated', 'description', 'pictures',
     ];
 
     protected $casts = [
