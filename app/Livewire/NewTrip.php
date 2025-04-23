@@ -30,6 +30,7 @@ class NewTrip extends Component
     public $departureLon;
     public $arrivalLat;
     public $arrivalLon;
+    public $co2Emission;
 
     public function mount($id)
     {
@@ -80,6 +81,15 @@ class NewTrip extends Component
 
     public function createTrip()
     {        
+        if(!$this->isFirstTrip)
+        {
+            $orderNumber = Trip::where('travel_id', $this->travelID)->max('order_number') + 1;
+        }
+        else
+        {
+            $orderNumber = 1;
+        }
+
         $trip = Trip::create([
             'travel_id' => $this->travelID,
             'transportation_id' => $this->transportation->id,
@@ -87,13 +97,10 @@ class NewTrip extends Component
             'arrival_location' => $this->arrival->id,
             'days_spent_at_destination' => $this->daysSpentAtDestination,
             'description' => $this->description,
-            //TO DO : Calculer la distance entre les deux points pour déterminer lenght_in_km
             'length_in_km' => $this->distanceInKm,
-            'departure_date' => $this->departureDate->format('Y-m-d'), // ou toDateString()
-            // TO DO : Calculer l'émission de CO2 en fonction du mode de transport et de la distance
-            'co2_emission_in_kg' => 333,
-            // TO DO : Attribuer un order_number en fonction de l'ordre des trips
-            'order_number' => 1,
+            'departure_date' => $this->departureDate->format('Y-m-d'), 
+            'co2_emission_in_kg' => $this->co2Emission,
+            'order_number' => $orderNumber,
             // TO DO : Implémenter la sélection d'une image par défaut pour le trip
             'pictures' => 'default.jpg',
         ]);
@@ -182,7 +189,9 @@ class NewTrip extends Component
             {
                 $distanceInMeters = $response['routes'][0]['distance'];
                 $this->distanceInKm = $distanceInMeters / 1000;
-                $this->travel->total_length = $this->travel->total_length + $this->distanceInKm;        
+                $this->travel->total_length = $this->travel->total_length + $this->distanceInKm;
+                $this->co2Emission = ($this->transportation->co2_emission_per_km_grams * $this->distanceInKm) / 1000; 
+                $this->travel->total_co2_emission_in_kg = $this->travel->total_co2_emission_in_kg + $this->co2Emission;    
             }
         $this->travel->save();
     }
