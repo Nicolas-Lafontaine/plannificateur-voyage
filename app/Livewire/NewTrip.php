@@ -8,9 +8,11 @@ use App\Models\Location;
 use App\Models\Transportation;
 use App\Models\Travel;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 
 class NewTrip extends Component
 {
+    public $travel;
     public $travelID;
     public $transportationName;
     public $transportation;
@@ -23,6 +25,11 @@ class NewTrip extends Component
     public $departureDate;
     public $customDepartureDate;
     public $isFirstTrip = false;
+    public $distanceInKm;
+    public $departureLat;
+    public $departureLon;
+    public $arrivalLat;
+    public $arrivalLon;
 
     public function mount($id)
     {
@@ -53,19 +60,19 @@ class NewTrip extends Component
 
     public function createLocations()
     {
-        [$departureLat, $departureLng] = explode(',', $this->departureLocation);
-        [$arrivalLat, $arrivalLng] = explode(',', $this->arrivalLocation);
+        [$this->departureLat, $this->departureLon] = explode(',', $this->departureLocation);
+        [$this->arrivalLat, $this->arrivalLon] = explode(',', $this->arrivalLocation);
     
         $this->departure = Location::firstOrCreate([
-            'latitude' => $departureLat,
-            'longitude' => $departureLng,
+            'latitude' => $this->departureLat,
+            'longitude' => $this->departureLon,
             'country_id' => 1
         ]);
         $this->departure->save();
 
         $this->arrival = Location::firstOrCreate([
-            'latitude' => $arrivalLat,
-            'longitude' => $arrivalLng,
+            'latitude' => $this->arrivalLat,
+            'longitude' => $this->arrivalLon,
             'country_id' => 1
         ]);
         $this->arrival->save();
@@ -81,7 +88,7 @@ class NewTrip extends Component
             'days_spent_at_destination' => $this->daysSpentAtDestination,
             'description' => $this->description,
             //TO DO : Calculer la distance entre les deux points pour déterminer lenght_in_km
-            'length_in_km' => 333,
+            'length_in_km' => $this->distanceInKm,
             'departure_date' => $this->departureDate->format('Y-m-d'), // ou toDateString()
             // TO DO : Calculer l'émission de CO2 en fonction du mode de transport et de la distance
             'co2_emission_in_kg' => 333,
@@ -109,7 +116,6 @@ class NewTrip extends Component
     
         return $rules;
     }
-    
     
     public function messages()
     {
@@ -149,6 +155,8 @@ class NewTrip extends Component
         $this->createLocations();
 
         $this->transportation = Transportation::where('name', $this->transportationName)->first();
+
+        $this->getRoute();
     
         $this->createTrip();
 
@@ -159,6 +167,25 @@ class NewTrip extends Component
         $this->reset(['departureLocation', 'arrivalLocation', 'transportationName', 'daysSpentAtDestination', 'description', 'customDepartureDate']);
     }
     
+    public function getRoute()
+    {
+        $routeGeoJSON = ["type" => "FeatureCollection", "features" => []];        
+        
+            $profile = ($this->transportationName === 'foot') ? 'foot' : 'driving';
+            $osrmPort = ($profile === 'foot') ? 5001 : 5000;
+
+            $url = "http://localhost:{$osrmPort}/route/v1/{$profile}/{$this->departureLon},{$this->departureLat};{$this->arrivalLon},{$this->arrivalLat}?overview=full&geometries=geojson";
+
+            $response = Http::get($url);
+
+            if ($response->successful() && isset($response['routes'][0]['geometry'])) 
+            {
+                $distanceInMeters = $response['routes'][0]['distance'];
+                $this->distanceInKm = $distanceInMeters / 1000;
+                $this->travel->total_length = $this->travel->total_length + $this->distanceInKm;        
+            }
+        $this->travel->save();
+    }
 
     public function render()
     {
