@@ -80,7 +80,6 @@
     let departureMarker = null;
     let arrivalMarker = null;
     let isSettingDeparture = true;
-    let testValue = "toto";
 
     map.on('click', function(e) {
         const { lat, lng } = e.latlng;

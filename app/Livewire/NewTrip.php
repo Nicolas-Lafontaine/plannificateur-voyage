@@ -7,6 +7,7 @@ use App\Models\Trip;
 use App\Models\Location;
 use App\Models\Transportation;
 use App\Models\Travel;
+use App\Models\Country;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 
@@ -63,21 +64,43 @@ class NewTrip extends Component
     {
         [$this->departureLat, $this->departureLon] = explode(',', $this->departureLocation);
         [$this->arrivalLat, $this->arrivalLon] = explode(',', $this->arrivalLocation);
+
+        $departureCountryName = $this->getCountryFromCoordinates($this->departureLat, $this->departureLon);
+        $arrivalCountryName = $this->getCountryFromCoordinates($this->arrivalLat, $this->arrivalLon);
+
+        $departureCountry = Country::where('name', $departureCountryName)->first();
+        $arrivalCountry = Country::where('name', $arrivalCountryName)->first();
     
         $this->departure = Location::firstOrCreate([
             'latitude' => $this->departureLat,
             'longitude' => $this->departureLon,
-            'country_id' => 1
+            'country_id' => $departureCountry->id
         ]);
         $this->departure->save();
 
         $this->arrival = Location::firstOrCreate([
             'latitude' => $this->arrivalLat,
             'longitude' => $this->arrivalLon,
-            'country_id' => 1
+            'country_id' => $arrivalCountry->id
         ]);
         $this->arrival->save();
     }
+
+    private function getCountryFromCoordinates($lat, $lon)
+    {
+        $url = "https://nominatim.openstreetmap.org/reverse?format=json&lat={$lat}&lon={$lon}&zoom=5&addressdetails=1";
+
+        $response = Http::withHeaders([
+            'User-Agent' => 'MyTravelApp/1.0' // Important, sinon Nominatim rejette la requête
+        ])->get($url);
+
+        if ($response->successful()) {
+            return $response->json()['address']['country'] ?? 'Inconnu';
+        }
+
+        return 'Inconnu';
+    }
+
 
     public function createTrip()
     {        
