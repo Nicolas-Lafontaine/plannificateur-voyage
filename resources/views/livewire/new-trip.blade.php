@@ -72,7 +72,11 @@
 @push('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    let map = L.map('map').setView([45.5017, -73.5673], 12);
+    const initialLat = @js($latitudeLastTrip ?? 45.5017);
+    const initialLng = @js($longitudeLastTrip ?? -73.5673);
+    const zoomLevel = @js($zoomDefault ?? 10);
+
+    let map = L.map('map').setView([initialLat, initialLng], zoomLevel);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);

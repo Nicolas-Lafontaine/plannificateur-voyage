@@ -32,6 +32,9 @@ class NewTrip extends Component
     public $arrivalLat;
     public $arrivalLon;
     public $co2Emission;
+    public $latitudeLastTrip;
+    public $longitudeLastTrip;
+    public $zoomDefault;
 
     public function mount($id)
     {
@@ -42,6 +45,12 @@ class NewTrip extends Component
 
         if (!$lastTrip) {
             $this->isFirstTrip = true;
+        }
+        else
+        {
+            $this->latitudeLastTrip = $lastTrip->arrivalLocation->latitude;
+            $this->longitudeLastTrip = $lastTrip->arrivalLocation->longitude;
+            $this->zoomDefault = 9;
         }
     }
 
