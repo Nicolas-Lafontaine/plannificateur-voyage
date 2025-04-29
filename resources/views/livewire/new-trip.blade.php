@@ -83,11 +83,21 @@
 
     let departureMarker = null;
     let arrivalMarker = null;
-    let isSettingDeparture = true;
+    let isSettingDeparture = false;
+    let isFirstTripCreated = false;
+
+    if(@js(!$isFirstTrip)){
+        departureMarker = L.marker([initialLat,initialLng]).addTo(map).bindPopup("Étape précédente").openPopup();
+    }
 
     map.on('click', function(e) {
         const { lat, lng } = e.latlng;
         const coordStr = `${lat.toFixed(5)},${lng.toFixed(5)}`;
+
+        if(@js($isFirstTrip) && !isFirstTripCreated){
+            isSettingDeparture = !isSettingDeparture;
+            console.log("Changement de l'état de isSettingDeparture");
+        }
 
         if (isSettingDeparture) {
             if (departureMarker) map.removeLayer(departureMarker);
@@ -100,8 +110,36 @@
             document.getElementById('arrivalLocation').value = coordStr;
             Livewire.dispatch('updateArrivalLocation', { value: coordStr });
         }
-        isSettingDeparture = !isSettingDeparture;
     });
+
+    window.addEventListener('trip-added', event => {
+    
+        console.log("📡 Données reçues de Livewire :", event.detail);
+        const lat = event.detail[0].lat;
+        const lng = event.detail[0].lng;
+
+        console.log("Lat:", lat);
+        console.log("Lng:", lng);
+
+
+        // Supprime les anciens marqueurs
+        if (departureMarker) map.removeLayer(departureMarker);
+        if (arrivalMarker) map.removeLayer(arrivalMarker);
+
+        // Place le nouveau marker de départ
+        departureMarker = L.marker([lat, lng]).addTo(map).bindPopup("Étape précédente").openPopup();
+        map.setView([lat, lng], zoomLevel);
+
+        // Réinitialise les champs
+        document.getElementById('departureLocation').value = `${lat},${lng}`;
+        Livewire.dispatch('updateDepartureLocation', { value: `${lat},${lng}` });
+
+        isSettingDeparture = false; 
+        @js($isFirstTrip = false);
+        isFirstTripCreated = true;
+        
+    });
+
 
 </script>
 @endpush

@@ -35,23 +35,38 @@ class NewTrip extends Component
     public $latitudeLastTrip;
     public $longitudeLastTrip;
     public $zoomDefault;
+    public $arrivalLastTrip;
+    public $lastTrip;
 
     public function mount($id)
     {
         $this->travel = Travel::findOrFail($id);
         $this->travelID = $this->travel->id;
 
-        $lastTrip = Trip::where('travel_id', $this->travelID)->orderBy('departure_date', 'desc')->first();
+        $this->isFirstTrip();
+    }
 
-        if (!$lastTrip) {
+    public function isFirstTrip()
+    {
+        $this->lastTrip = Trip::where('travel_id', $this->travelID)->orderBy('departure_date', 'desc')->first();
+
+        if (!$this->lastTrip) {
             $this->isFirstTrip = true;
         }
         else
         {
-            $this->latitudeLastTrip = $lastTrip->arrivalLocation->latitude;
-            $this->longitudeLastTrip = $lastTrip->arrivalLocation->longitude;
+            // Attribue une valeur pour le champ du formulaire
+            $this->departureLocation =$this->lastTrip->arrivalLocation->latitude . ',' . $this->lastTrip->arrivalLocation->longitude;
+            // Attribue une valeur pour le calcul de la distance
+            $this->departureLon = $this->lastTrip->arrivalLocation->longitude;
+            $this->departureLat = $this->lastTrip->arrivalLocation->latitude;
+            // Donne une itance à lier avec le nouveau trip
+            $this->departure = $this->lastTrip->arrivalLocation;
+            // Données nécessaires au placement du marqueur de départ sur la carte
+            $this->latitudeLastTrip = $this->lastTrip->arrivalLocation->latitude;
+            $this->longitudeLastTrip = $this->lastTrip->arrivalLocation->longitude;
             $this->zoomDefault = 9;
-        }
+        }    
     }
 
     protected $listeners = [
@@ -62,6 +77,7 @@ class NewTrip extends Component
     public function updateDepartureLocation($value)
     {
         $this->departureLocation = $value;
+        \Log::info('Emplacement de départ mis à jour après submit : ' . $this->departureLocation);
     }
     
     public function updateArrivalLocation($value)
@@ -71,21 +87,23 @@ class NewTrip extends Component
 
     public function createLocations()
     {
-        [$this->departureLat, $this->departureLon] = explode(',', $this->departureLocation);
+        if($this->isFirstTrip)
+        {
+            [$this->departureLat, $this->departureLon] = explode(',', $this->departureLocation);
+            $departureCountryName = $this->getCountryFromCoordinates($this->departureLat, $this->departureLon);
+            $departureCountry = Country::where('name', $departureCountryName)->first();
+
+            $this->departure = Location::firstOrCreate([
+                'latitude' => $this->departureLat,
+                'longitude' => $this->departureLon,
+                'country_id' => $departureCountry->id
+            ]);
+            $this->departure->save();
+        }
+
         [$this->arrivalLat, $this->arrivalLon] = explode(',', $this->arrivalLocation);
-
-        $departureCountryName = $this->getCountryFromCoordinates($this->departureLat, $this->departureLon);
         $arrivalCountryName = $this->getCountryFromCoordinates($this->arrivalLat, $this->arrivalLon);
-
-        $departureCountry = Country::where('name', $departureCountryName)->first();
         $arrivalCountry = Country::where('name', $arrivalCountryName)->first();
-    
-        $this->departure = Location::firstOrCreate([
-            'latitude' => $this->departureLat,
-            'longitude' => $this->departureLon,
-            'country_id' => $departureCountry->id
-        ]);
-        $this->departure->save();
 
         $this->arrival = Location::firstOrCreate([
             'latitude' => $this->arrivalLat,
@@ -181,12 +199,21 @@ class NewTrip extends Component
     {        
         $validated = $this->validate();
 
-        $lastTrip = Trip::where('travel_id', $this->travelID)->orderBy('departure_date', 'desc')->first();
+        //$lastTrip = Trip::where('travel_id', $this->travelID)->orderBy('departure_date', 'desc')->first();
+
+        $lastTrip = Trip::where('travel_id', $this->travelID)
+        ->orderBy('departure_date', 'desc')
+        ->orderBy('created_at', 'desc') 
+        ->first();
 
         if ($lastTrip) {
+            \Log::info('Dernier trip trouvé : ' . $lastTrip->id);
+            \Log::info('Dernier trip trouvé : ' . $lastTrip->departure_date);
+            \Log::info('Dernier trip trouvé : ' . $lastTrip->days_spent_at_destination);
             $lastDate = Carbon::parse($lastTrip->departure_date);
             $this->departureDate = $lastDate->addDays($lastTrip->days_spent_at_destination);
         } else {
+            \Log::info('Aucun dernier trip trouvé, on utilise la date de départ personnalisée.');
             $newDate = Carbon::parse($this->customDepartureDate);
             $this->departureDate = $newDate;
         }
@@ -204,6 +231,14 @@ class NewTrip extends Component
         $this->isFirstTrip = false;
 
         $this->reset(['departureLocation', 'arrivalLocation', 'transportationName', 'daysSpentAtDestination', 'description', 'customDepartureDate']);
+        $this->isFirstTrip();
+        
+        \Log::info('Données envoyées au front end pour le marqueur de départ : ' . $this->arrivalLat . ' ' . $this->arrivalLon);
+
+        $this->dispatch('trip-added', [
+            'lat' => $this->arrivalLat,
+            'lng' => $this->arrivalLon,
+        ]);        
     }
     
     public function getRoute()
