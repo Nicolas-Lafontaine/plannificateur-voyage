@@ -23,10 +23,24 @@
                 <td>{{ number_format($trip->co2_emission_in_kg, 2) }} kg</td>
                 <td>{{ $trip->days_spent_at_destination }}</td>
                 <td>
-                    <button wire:click="deleteTrip({{ $trip->id }})" class="btn btn-danger btn-sm"
-                        onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette étape ?')">
-                        Supprimer
-                    </button>
+                    <div x-data="{ confirming: false }">
+                        <template x-if="!confirming">
+                            <button @click="confirming = true" class="btn btn-danger btn-sm">
+                                Supprimer
+                            </button>
+                        </template>
+                        <template x-if="confirming">
+                            <div class="flex items-center gap-2">
+                                <span>Confirmer la suppression ?</span>
+                                <button type="button" @click="$wire.deleteTrip({{ $trip->id }})" class="btn btn-danger btn-sm">
+                                    Oui
+                                </button>
+                                <button @click="confirming = false" class="btn btn-secondary btn-sm">
+                                    Annuler
+                                </button>
+                            </div>
+                        </template>
+                    </div>
                 </td>
                 <td>
                     <a href="{{ route('edit-trip', $trip->id )}}" class="btn btn-primary">Modifier</a>

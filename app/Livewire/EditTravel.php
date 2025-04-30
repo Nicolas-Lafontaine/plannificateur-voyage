@@ -28,6 +28,7 @@ class EditTravel extends Component
             return;
         }
         $trip->delete();
+        $this->mount($this->travel->id);
     }
 
     public function calculateTotal()
