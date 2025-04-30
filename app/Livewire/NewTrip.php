@@ -259,6 +259,7 @@ class NewTrip extends Component
                 $this->travel->total_length = $this->travel->total_length + $this->distanceInKm;
                 $this->co2Emission = ($this->transportation->co2_emission_per_km_grams * $this->distanceInKm) / 1000; 
                 $this->travel->total_co2_emission_in_kg = $this->travel->total_co2_emission_in_kg + $this->co2Emission;    
+                $this->travel->total_duration = $this->travel->total_duration + $this->daysSpentAtDestination;
             }
         $this->travel->save();
     }
