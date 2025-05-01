@@ -1,6 +1,4 @@
-<div>
-    <h2>Ajouter une étape</h2>
-    
+<div>    
     <div id="map" wire:ignore style="height: 600px; width: 100%;"></div>
 
     <div class="form-container mt-4 p-4 border border-gray-300 rounded">

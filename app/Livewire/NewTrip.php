@@ -152,7 +152,7 @@ class NewTrip extends Component
             'co2_emission_in_kg' => $this->co2Emission,
             'order_number' => $orderNumber,
             // TO DO : Implémenter la sélection d'une image par défaut pour le trip
-            'pictures' => 'default.jpg',
+            'pictures' => 'images/trips/default_trip_image.jpg',
         ]);
         $trip->save();
     }
