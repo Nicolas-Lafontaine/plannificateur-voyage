@@ -8,11 +8,13 @@
         <div class="carousel-inner">
             @foreach($latestTravels as $index => $travel)
                 <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                <img class="d-block w-100 carousel-image" src="{{ $travel->image_url_carrousel }}" alt="{{ $travel->name }}">
-                    <div class="carousel-caption d-none d-md-block">
-                        <h5>{{ $travel->name }}</h5>
-                        <p>{{ $travel->total_length }} km</p>
-                    </div>
+                    <a href="{{ route('travels.show', $travel->id) }}">
+                        <img class="d-block w-100 carousel-image" src="{{ $travel->image_url_carrousel }}" alt="{{ $travel->name }}">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5>{{ $travel->name }}</h5>
+                            <p>{{ $travel->total_length }} km</p>
+                        </div>
+                    </a>
                 </div>
             @endforeach
         </div>
