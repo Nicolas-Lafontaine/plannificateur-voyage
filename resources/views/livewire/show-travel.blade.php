@@ -1,21 +1,29 @@
-<div>
-    <div class="mb-4">
-        <label>Départ : <input type="text"  placeholder="-42.0,71.0" class="border rounded p-1" /></label>
-        <label>Arrivée : <input type="text"  placeholder="-41.0,72.0" class="border rounded p-1" /></label>
-        <label>Points intermédiaires : 
-    <input type="text" wire:model="waypoints" placeholder="-41.5,71.5;-41.7,71.7" class="border rounded p-1" />
-</label>
-
-        <button wire:click="getRoute" class="px-4 py-2 bg-blue-500 text-white rounded">Tracer la route</button>
+<div style="display: table; width: 100%; height: 100vh;">
+    <!-- Colonne Carte -->
+    <div style="display: table-cell; width: 70%; vertical-align: top;">
+        <div wire:ignore id="map" style="height: 100vh;"></div>
     </div>
 
-    @if (session()->has('error'))
-        <div class="text-red-500">{{ session('error') }}</div>
-    @endif
-
-    <div wire:ignore>
-        <div id="map" style="height: 800px;"></div>
+<!-- Colonne droite scrollable avec cartes Bootstrap -->
+<div style="display: table-cell; width: 35%; vertical-align: top; height: 100vh;">
+    <div style="height: 100%; overflow-y: auto; padding: 15px;">
+        <div class="row">
+            @forelse ($travel->trips as $trip)
+                <div class="col-12 mb-4">
+                    <div class="card h-100">
+                        <img src="{{ asset($trip->pictures) }}" class="card-img-top" alt="image de l'étape">
+                        <div class="card-body">
+                            <p class="card-text">{{ $trip->description }}</p>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <p class="text-muted">Aucune étape enregistrée.</p>
+            @endforelse
+        </div>
     </div>
+</div>
+
 </div>
 
 @push('styles')
@@ -29,11 +37,9 @@ let map;
 let routeLayer; 
 let markers = [];
 
-document.addEventListener('DOMContentLoaded', function () {
-
-        const initialLat = @js($latitudeTest ?? 72.0);
-        const initialLng = @js($longitudeTest ?? -41.0);
-        const zoomLevel = @js($zoomTest ?? 6);
+    const initialLat = @js($latitudeLastTrip ?? 45.5017);
+    const initialLng = @js($longitudeLastTrip ?? -73.5673);
+    const zoomLevel = @js($zoomDefault ?? 10);
 
         if (!map) {
         // Initialisation unique de la carte
@@ -127,7 +133,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     updateMarkers(allCoordinates, waypoints, descriptions); // Ajout des marqueurs sur tous les points
         });
-    });
 
 </script>
 @endpush

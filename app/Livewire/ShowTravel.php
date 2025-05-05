@@ -133,6 +133,7 @@ class ShowTravel extends Component
     public function mount($id)
     {
         $this->travel = Travel::findOrFail($id);
+        $this->getRoute();
     }
 
     public function render()
