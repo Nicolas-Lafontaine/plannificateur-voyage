@@ -32,9 +32,9 @@ class Trip extends Model
         return $this->belongsTo(Transportation::class);
     }
 
-    public function commentary()
+    public function commentaries()
     {
-        return $this->belongsTo(Commentary::class);
+        return $this->hasMany(Commentary::class);
     }
 
     public function travel()

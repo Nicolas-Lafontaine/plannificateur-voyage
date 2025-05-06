@@ -1,10 +1,9 @@
+<!-- Partie gauche (carte) -->
 <div style="display: table; width: 100%; height: 100vh;">
-    <!-- Colonne Carte -->
     <div style="display: table-cell; width: 70%; vertical-align: top;">
         <div wire:ignore id="map" style="height: 100vh;"></div>
     </div>
-
-<!-- Colonne droite scrollable avec cartes Bootstrap -->
+<!-- Partie droite (scrollbox contenant les étapes) -->
 <div style="display: table-cell; width: 35%; vertical-align: top; height: 100vh;">
     <div style="height: 100%; overflow-y: auto; padding: 15px;">
         <div class="row">
@@ -14,6 +13,55 @@
                         <img src="{{ asset($trip->pictures) }}" class="card-img-top" alt="image de l'étape">
                         <div class="card-body">
                             <p class="card-text">{{ $trip->description }}</p>
+                            <!-- Bouton pour ouvrir la partie déroulante -->
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#comments-{{ $trip->id }}" aria-expanded="false" aria-controls="comments-{{ $trip->id }}">
+                                Voir les commentaires <span class="ml-1">&#x25BC;</span> <!-- flèche vers le bas -->
+                            </button>
+                            <!-- Partie masquée par défaut -->
+                            <div class="collapse mt-2" id="comments-{{ $trip->id }}">
+                                <div class="card card-body" style="max-width: 500px;">
+                                    @if ($trip->commentaries && count($trip->commentaries) > 0)
+                                        <ul>
+                                            @foreach ($trip->commentaries as $commentary)
+                                                <li>
+                                                    <span style="font-weight: bold; font-size: 1.2em; color: red;">
+                                                    {{ $commentary->user->name }}
+                                                    </span>                                                
+                                                </li>
+                                                <li>{{ $commentary->text }}</li>
+                                                <li>
+                                                    <span style="font-size: 0.8em; color: gray;">
+                                                    {{ $commentary->created_at}}
+                                                    </span>
+                                                </li>
+                                                @if ($commentary->user_id === auth()->id())
+                                                <li>
+                                                    <button wire:click="deleteComment({{ $commentary->id }})" class="btn btn-sm btn-danger mt-1">
+                                                        Supprimer
+                                                    </button>
+                                                </li>
+                                                @endif
+                                            @endforeach
+                                        </ul>
+                                    @else
+                                        <p class="text-muted">Aucun commentaire.</p>
+                                    @endif
+                                    <!-- Formulaire d'ajout de commentaire -->
+                                    <div>
+                                        <textarea wire:model.defer="newComment.{{ $trip->id }}"
+                                                class="form-control @error('newComment.' . $trip->id) is-invalid @enderror"
+                                                rows="3" maxlength="250" placeholder="Écrire un commentaire (max 250 caractères)"></textarea>
+                                        @error('newComment.' . $trip->id)
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+
+                                        <button wire:click="addComment({{ $trip->id }})"
+                                                class="btn btn-sm btn-primary mt-2">
+                                            Envoyer
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

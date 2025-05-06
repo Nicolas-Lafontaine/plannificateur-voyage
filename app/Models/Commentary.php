@@ -10,7 +10,7 @@ class Commentary extends Model
     use HasFactory;
     
     protected $fillable = [
-        'user_id', 'text',
+        'user_id', 'text', 'trip_id',
     ];
 
     public function user()

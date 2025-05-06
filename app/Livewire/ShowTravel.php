@@ -3,6 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\Travel;
+use App\Models\Trip;
+use App\Models\Commentary;
 use Illuminate\Support\Facades\Http;
 use Livewire\Component;
 
@@ -12,6 +14,13 @@ class ShowTravel extends Component
     public $routeData;
     public $waypoints = '';
     public $descriptions = [];
+    public $newComment = [];
+    public array $expandedTrips = [];
+
+
+    protected $rules = [
+        'newComment.*' => 'required|string|max:250',
+    ];
 
     public function getRoute()
     {
@@ -129,6 +138,42 @@ class ShowTravel extends Component
             'descriptions' => $this->descriptions
         ]);
     }
+
+    public function addComment($tripId)
+    {
+        $this->validate([
+            'newComment.' . $tripId => 'required|string|max:250',
+        ]);
+
+        $comment = new Commentary();
+        $comment->trip_id = $tripId;
+        $comment->user_id = auth()->id();
+        $comment->text = $this->newComment[$tripId];
+        $comment->save();
+
+        // Réinitialiser le champ du commentaire
+        $this->newComment[$tripId] = '';
+
+        // Rafraîchir le modèle travel avec ses relations si nécessaire
+        //$this->travel->load('trips.commentaries');
+    }
+
+    public function deleteComment($commentaryId)
+    {
+    $commentary = Commentary::findOrFail($commentaryId);
+
+    if ($commentary->user_id !== auth()->id()) {
+        abort(403);
+    }
+
+    $commentary->delete();
+    }
+
+    public function toggleComments($tripId)
+    {
+    $this->expandedTrips[$tripId] = !($this->expandedTrips[$tripId] ?? false);
+    }
+
 
     public function mount($id)
     {
