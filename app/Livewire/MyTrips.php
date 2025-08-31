@@ -13,12 +13,16 @@ class MyTrips extends Component
 
     public $minLength;
     public $maxLength;
+    public $minDuration;
+    public $maxDuration;
     public $userId;
 
     public function mount()
     {
         $this->minLength = null;
         $this->maxLength = null;
+        $this->minDuration = null;
+        $this->maxDuration = null;
         $this->userId = Auth::id(); 
     }
 
@@ -40,8 +44,12 @@ class MyTrips extends Component
             $query->where('total_length', '<=', $this->maxLength);
         }
 
-        if ($this->maxLength) {
-            $query->where('total_length', '<=', $this->maxLength);
+        if ($this->minDuration) {
+            $query->where('total_duration', '>=', $this->minDuration);
+        }
+
+        if ($this->maxDuration) {
+            $query->where('total_duration', '<=', $this->maxDuration);
         }
 
         if ($this->userId) {

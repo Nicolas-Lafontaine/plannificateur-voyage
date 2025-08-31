@@ -12,12 +12,16 @@ class SearchItinerary extends Component
 
     public $minLength;
     public $maxLength;
+    public $minDuration;
+    public $maxDuration;
 
     public function mount()
     {
         // Initialisation des données, vous pouvez définir une valeur par défaut si nécessaire
         $this->minLength = null;
         $this->maxLength = null;
+        $this->minDuration = null;
+        $this->maxDuration = null;
     }
 
     public function updating($name, $value)
@@ -37,6 +41,14 @@ class SearchItinerary extends Component
 
         if ($this->maxLength) {
             $query->where('total_length', '<=', $this->maxLength);
+        }
+
+        if ($this->minDuration) {
+            $query->where('total_duration', '>=', $this->minDuration);
+        }
+
+        if ($this->maxDuration) {
+            $query->where('total_duration', '<=', $this->maxDuration);
         }
 
         $query->where('public', true);

@@ -4,7 +4,7 @@
         <thead>
             <tr>
                 <th>Nom du lieu</th>
-                <th>Distance avec étape précédente</th>
+                <th>Distance avec l'étape précédente</th>
                 <th>Date de départ</th>
                 <th>Transport utilisé</th>
                 <th>Émission de CO2</th>
