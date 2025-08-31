@@ -16,6 +16,10 @@ class ShowTravel extends Component
     public $descriptions = [];
     public $newComment = [];
     public array $expandedTrips = [];
+    public $searchedTripDescription;
+    public $searchedCountryName;
+    public $searchedTrips;
+    
 
 
     protected $rules = [
@@ -126,10 +130,10 @@ class ShowTravel extends Component
         }
         $this->travel->save();
 
-        \Log::info('--------------------------------------------------');
-        \Log::info('Route complète envoyée :', [$routeGeoJSON]);
-        \Log::info('Descriptions collectées:', $this->descriptions);
-        \Log::info('Waypoints avant l\'envoi :', [$this->waypoints]);
+        // \Log::info('--------------------------------------------------');
+        // \Log::info('Route complète envoyée :', [$routeGeoJSON]);
+        // \Log::info('Descriptions collectées:', $this->descriptions);
+        // \Log::info('Waypoints avant l\'envoi :', [$this->waypoints]);
         
         // Dispatch l'événement avec toutes les routes fusionnées et les waypoints
         $this->dispatch('updateRoute', [
@@ -179,10 +183,50 @@ class ShowTravel extends Component
     {
         $this->travel = Travel::findOrFail($id);
         $this->getRoute();
-    }
+        $this->searchedTrips = $this->travel->trips()->orderBy('order_number')->get();
+    }   
 
-    public function render()
-    {
-        return view('livewire.show-travel')->layout('layouts.app');
-    }
+        public function render()
+        {
+            $query = Trip::query();
+
+            // Appliquer les filtres
+            if (!empty($this->searchedTripDescription) && !$this->searchedTripDescription == '') {
+                $query->where('description', 'LIKE', '%' . $this->searchedTripDescription . '%');
+                \Log::info("Filtre description appliqué : ", [$this->searchedTripDescription]);
+            }
+
+            if (!empty($this->searchedCountryName)) {
+                $query->where('', '', $searchedCountryName);
+                \Log::info("Filtre pays appliqué : ", [$this->searchedCountryName]);
+            }
+            
+            //$this->$searchedTrips = $query->get();
+
+            return view('livewire.show-travel')->layout('layouts.app');
+        }
+
+
+
+
+    // public function render()
+    // {
+
+
+    //     if ($this->maxLength) {
+    //         $query->where('total_length', '<=', $this->maxLength);
+    //     }
+
+    //     if ($this->maxLength) {
+    //         $query->where('total_length', '<=', $this->maxLength);
+    //     }
+
+    //     if ($this->userId) {
+    //         $query->where('user_id', '=', intval($this->userId));
+    //     }
+
+
+    //     return view('livewire.my-trips', ['travels' => $travels]);
+    // }
+
 }

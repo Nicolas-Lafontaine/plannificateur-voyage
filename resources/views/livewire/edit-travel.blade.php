@@ -5,7 +5,7 @@
             <tr>
                 <th>Nom du lieu</th>
                 <th>Distance avec étape précédente</th>
-                <th>Date prévue</th>
+                <th>Date de départ</th>
                 <th>Transport utilisé</th>
                 <th>Émission de CO2</th>
                 <th>Jours sur place</th>

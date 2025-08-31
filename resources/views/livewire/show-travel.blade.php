@@ -5,9 +5,19 @@
     </div>
 <!-- Partie droite (scrollbox contenant les étapes) -->
 <div style="display: table-cell; width: 35%; vertical-align: top; height: 100vh;">
+    <div class="flex-1 mr-4">
+        <input type="text" wire:model.lazy="searchedTripDescription" placeholder="Filtrer par nom" class="w-full p-2 border rounded">
+        <select id="searchedCountryName" name="searchedCountryName" class="w-full border rounded p-1" wire:model="searchedCountryName">
+                <option value="">Filtrer par pays visité</option>
+                <option value="driving">Voiture</option>
+                <option value="foot">Marche</option>
+                <option value="bike">Vélo</option>
+        </select>
+        @error('searchedCountryName') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+    </div>
     <div style="height: 100%; overflow-y: auto; padding: 15px;">
         <div class="row">
-            @forelse ($travel->trips as $trip)
+            @forelse ($searchedTrips as $trip)
                 <div class="col-12 mb-4">
                     <div class="card h-100">
                         <img src="{{ asset($trip->pictures) }}" class="card-img-top" alt="image de l'étape">
