@@ -10,8 +10,8 @@
         <div class="mb-6">
             <div class="flex justify-between items-center">
                 <div class="flex-1 mr-4">
-                    <input type="number" wire:model.lazy="minLength" placeholder="Longueur minimale (en km)" class="w-full p-2 border rounded">
-                    <input type="number" wire:model.lazy="maxLength" placeholder="Longueur maximale (en km)" class="w-full p-2 border rounded mt-2">
+                    <input type="number" wire:model.lazy="minLength" placeholder="Longueur minimale (en km)" class="w-32 p-2 border rounded">
+                    <input type="number" wire:model.lazy="maxLength" placeholder="Longueur maximale (en km)" class="w-32 p-2 border rounded mt-2">
                 </div>
                 <button class="bg-blue-500 text-white px-4 py-2 rounded" wire:click="render">Filtrer</button>
             </div>
