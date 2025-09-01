@@ -40,6 +40,10 @@
                             <p class="card-text">Durée totale : {{ $travel->total_duration }} jours</p>
                             <a href="{{ route('travels.show', $travel->id) }}" class="btn btn-primary">Voir</a>
                             <a href="{{ route('edit-travel', $travel->id) }}" class="btn btn-primary">Modifier</a>
+                            <!-- Bouton Supprimer -->
+                            <form wire:submit.prevent="deleteTravel({{ $travel->id }})" style="display:inline;">
+                                <button type="submit" class="btn btn-danger">Supprimer</button>
+                            </form>
                         </div>
                     </div>
                 </div>

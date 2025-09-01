@@ -31,6 +31,19 @@ class MyTrips extends Component
         $this->resetPage();
     }
 
+    public function deleteTravel($id)
+    {
+        $travel = Travel::find($id);
+
+        if ($travel) {
+            $travel->delete();
+        }
+
+    // Recharge la liste
+    $this->render();
+    }
+
+
     public function render()
     {
         $query = Travel::query();
