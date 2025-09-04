@@ -19,7 +19,21 @@
                 <td>{{ $trip->description }}</td>
                 <td>{{ $trip->length_in_km }} km</td>
                 <td>{{ $trip->departure_date->format('Y-m-d')}} </td>
-                <td>{{ $trip->transportation->name }}</td>
+                <td>
+                    @php
+                        $translations = [
+                            'driving' => 'Voiture',
+                            'car' => 'Voiture',
+                            'plane' => 'Avion',
+                            'train' => 'Train',
+                            'bus' => 'Bus',
+                            'bike' => 'Vélo',
+                        ];
+                        $name = $trip->transportation->name;
+                    @endphp
+
+                    {{ $translations[$name] ?? $name }}
+                </td>
                 <td>{{ number_format($trip->co2_emission_in_kg, 2) }} kg</td>
                 <td>{{ $trip->days_spent_at_destination }}</td>
                 <td>
