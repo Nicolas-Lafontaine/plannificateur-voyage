@@ -30,6 +30,7 @@
                             <p class="card-text">Distance totale : {{ number_format($travel->total_length, 2) }} km</p>
                             <p class="card-text">Impact Co2 : {{ number_format($travel->total_co2_emission_in_kg, 2) }} kg</p>
                             <p class="card-text">Durée totale : {{ $travel->total_duration }} jours</p>
+                            <p class="card-text">Créé par : {{ $travel->user->name }}</p>
                             <a href="{{ route('travels.show', $travel->id) }}" class="btn btn-primary">Voir</a>
                         </div>
                     </div>
